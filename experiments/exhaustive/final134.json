@@ -1,0 +1,1 @@
+{"P-automaton":{"states":{"p0":{"edges":[],"initial":true},"p1":{"accepting":true,"edges":[{"label":"B","to":"q2"}],"initial":true},"q2":{"edges":[{"label":"A","to":"q2"}]}}}}

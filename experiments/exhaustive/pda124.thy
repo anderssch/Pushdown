@@ -1,0 +1,4 @@
+definition pds_rules_124 :: "(ctr_loc, label) rule set" where
+  "pds_rules_124 = {
+  ((p0, A), (p0, push A A)),
+  ((p1, B), (p1, push B B))}"

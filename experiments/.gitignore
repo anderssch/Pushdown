@@ -1,0 +1,9 @@
+build/
+network-tests-json/
+random-tests-json/
+network-tests-*-thy/
+random-tests-*-thy/
+exhaustive-tests-*-thy/
+DD-DIR/
+ISABELLE-TEST/
+*.log
