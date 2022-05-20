@@ -1345,7 +1345,7 @@ section \<open>Automata\<close>
 subsection \<open>P-Automaton locale\<close>
 
 locale P_Automaton = LTS transition_relation for transition_relation :: "('state::finite, 'label) transition set" +
-  fixes finals :: "'state set" and initials :: "'state set"
+  fixes initials :: "'state set" and finals :: "'state set"
 begin
 
 definition accepts_aut :: "'state \<Rightarrow> 'label list \<Rightarrow> bool" where
@@ -1442,12 +1442,12 @@ end
 subsection \<open>Intersection P-Automaton locale\<close>
 
 locale Intersection_P_Automaton = 
-  A1: P_Automaton ts1 finals1 initials +
-  A2: P_Automaton ts2 finals2 initials
-  for ts1 :: "('state :: finite, 'label) transition set" and finals1 :: "'state set" and initials :: "'state set" and
+  A1: P_Automaton ts1 initials finals1 +
+  A2: P_Automaton ts2 initials finals2
+  for ts1 :: "('state :: finite, 'label) transition set" and initials :: "'state set" and finals1 :: "'state set" and
    ts2 :: "('state, 'label) transition set" and finals2 :: "'state set" begin
 
-sublocale pa: P_Automaton "inters ts1 ts2" "inters_finals finals1 finals2" "(\<lambda>x. (x,x)) `  initials"
+sublocale pa: P_Automaton "inters ts1 ts2" "(\<lambda>x. (x,x)) `  initials" "inters_finals finals1 finals2"
   .
 
 definition accepts_aut_inters where
