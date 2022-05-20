@@ -272,12 +272,12 @@ end
     std::ostream& print_automaton_state(size_t state, const pdaaal::PAutomaton<>& automaton, bool print_type = true) {
         if (state < automaton.pda().states().size()) {
             if (print_type) {
-                _out << "Initial ";
+                _out << "Init ";
             }
             _out << "p" << state;
         } else {
             if (print_type) {
-                _out << "Noninitial ";
+                _out << "Noninit ";
             }
             _out << "q" << state;
         }
