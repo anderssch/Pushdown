@@ -1,4 +1,4 @@
-This directory contains the Isabelle formalization used in our CAV2022 submission.
+This directory contains the Isabelle formalization used in our submission.
 If you have Isabelle2021-1 (https://isabelle.in.tum.de) and the 
 Archive of Formal Proofs 2021-1 (https://www.isa-afp.org) installed, then you can open 
 Isabelle/jEdit to inspect our proofs.
@@ -20,5 +20,5 @@ $ ./Isabelle2021-1/bin/isabelle jedit
 
 
 The last command starts Isabelle/jEdit which is Isabelle's Prover IDE.
-In Isabelle/jEdit under File>Open you can  open the various .thy files in our 
+In Isabelle/jEdit under File>Open you can open the various .thy files in our 
 reproducibility package to inspect our proofs.

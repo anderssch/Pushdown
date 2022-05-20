@@ -27,7 +27,7 @@ Bash scripts (see more below)
 
 === Setup ===
 Before running experiments, make sure to setup Isabelle as described in ../Formalization/README.txt
-Also, if the path of your Isabelle installation is not '~/CAV2022/Isabelle2021-1/bin/isabelle', 
+Also, if the path of your Isabelle installation is not '~/Pushdown/Isabelle2021-1/bin/isabelle', 
 then please edit line 4 in both 'run-isabelle.sh' and 'delta-debug.sh' so that ISABELLE_PATH points
 to your Isabelle installation.
 

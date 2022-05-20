@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # TODO: Make sure this points to your Isabelle installation.
-ISABELLE_PATH="$HOME/CAV2022/Isabelle2021-1/bin/isabelle"
+ISABELLE_PATH="$HOME/Pushdown/Isabelle2021-1/bin/isabelle"
 
 INPUT_FOLDER="$1"
 if [ -z ${INPUT_FOLDER} ] ; then
