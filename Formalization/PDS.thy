@@ -17,16 +17,16 @@ locale PDS =
   
 begin
 
-primrec op_labels :: "'label operation \<Rightarrow> 'label list" where
-  "op_labels pop = []"
-| "op_labels (swap \<gamma>) = [\<gamma>]" 
-| "op_labels (push \<gamma>  \<gamma>') = [\<gamma>, \<gamma>']"
+primrec lbl :: "'label operation \<Rightarrow> 'label list" where
+  "lbl pop = []"
+| "lbl (swap \<gamma>) = [\<gamma>]" 
+| "lbl (push \<gamma>  \<gamma>') = [\<gamma>, \<gamma>']"
 
 definition is_rule :: "'ctr_loc \<times> 'label \<Rightarrow> 'ctr_loc \<times> 'label operation \<Rightarrow> bool" (infix "\<hookrightarrow>" 80) where
   "p\<gamma> \<hookrightarrow> p'w \<equiv> (p\<gamma>,p'w) \<in> \<Delta>"
 
 inductive_set transition_rel :: "(('ctr_loc, 'label) conf \<times> unit \<times> ('ctr_loc, 'label) conf) set" where
-  "(p, \<gamma>) \<hookrightarrow> (p', w) \<Longrightarrow> ((p, \<gamma>#w'), (), (p', (op_labels w)@w')) \<in> transition_rel"
+  "(p, \<gamma>) \<hookrightarrow> (p', w) \<Longrightarrow> ((p, \<gamma>#w'), (), (p', (lbl w)@w')) \<in> transition_rel"
 
 interpretation LTS transition_rel .
 
@@ -34,7 +34,7 @@ notation step_relp (infix "\<Rightarrow>" 80)
 notation step_starp (infix "\<Rightarrow>\<^sup>*" 80)
 
 lemma step_relp_def2:
-  "(p, \<gamma>w') \<Rightarrow> (p',ww') \<longleftrightarrow> (\<exists>\<gamma> w' w. \<gamma>w' = \<gamma>#w' \<and> ww' = (op_labels w)@w' \<and> (p, \<gamma>) \<hookrightarrow> (p', w))"
+  "(p, \<gamma>w') \<Rightarrow> (p',ww') \<longleftrightarrow> (\<exists>\<gamma> w' w. \<gamma>w' = \<gamma>#w' \<and> ww' = (lbl w)@w' \<and> (p, \<gamma>) \<hookrightarrow> (p', w))"
   by (metis (no_types, lifting) PDS.transition_rel.intros step_relp_def transition_rel.cases)
 
 end
@@ -257,12 +257,12 @@ qed
 subsection \<open>Saturation rules\<close>
 
 inductive pre_star_rule :: "(('ctr_loc, 'noninit, 'label) state, 'label) transition set \<Rightarrow> (('ctr_loc, 'noninit, 'label) state, 'label) transition set \<Rightarrow> bool" where 
-  add_trans: "(p, \<gamma>) \<hookrightarrow> (p', w) \<Longrightarrow> (Init p', op_labels w, q) \<in> LTS.trans_star ts \<Longrightarrow>
+  add_trans: "(p, \<gamma>) \<hookrightarrow> (p', w) \<Longrightarrow> (Init p', lbl w, q) \<in> LTS.trans_star ts \<Longrightarrow>
     (Init p, \<gamma>, q) \<notin> ts \<Longrightarrow> pre_star_rule ts (ts \<union> {(Init p, \<gamma>, q)})"
 
 definition pre_star1 :: "(('ctr_loc, 'noninit, 'label) state, 'label) transition set \<Rightarrow> (('ctr_loc, 'noninit, 'label) state, 'label) transition set" where
   "pre_star1 ts =
-    (\<Union>((p, \<gamma>), (p', w)) \<in> \<Delta>. \<Union>q \<in> LTS.reach ts (Init p') (op_labels w). {(Init p, \<gamma>, q)})"
+    (\<Union>((p, \<gamma>), (p', w)) \<in> \<Delta>. \<Union>q \<in> LTS.reach ts (Init p') (lbl w). {(Init p, \<gamma>, q)})"
 
 lemma pre_star1_mono: "mono pre_star1"
   unfolding pre_star1_def
@@ -279,7 +279,7 @@ proof -
   proof (induct X arbitrary: ts rule: finite_induct)
     case (insert x F)
     then obtain p \<gamma> p' w q where *: "(p, \<gamma>) \<hookrightarrow> (p', w)" 
-      "(Init p', op_labels w, q) \<in> LTS.trans_star ts" and x:
+      "(Init p', lbl w, q) \<in> LTS.trans_star ts" and x:
       "x = (Init p, \<gamma>, q)"
       by (auto simp: pre_star1_def is_rule_def LTS.trans_star_code)
     with insert show ?case
@@ -515,15 +515,15 @@ next
     using step by auto
   then obtain q where q_p: "q \<in> finals \<and> (Init p'', u, q) \<in> LTS.trans_star A'"
     unfolding accepts_def by auto
-  have "\<exists>\<gamma> w1 u1. w=\<gamma>#w1 \<and> u=op_labels u1@w1 \<and> (p', \<gamma>) \<hookrightarrow> (p'', u1)"
+  have "\<exists>\<gamma> w1 u1. w=\<gamma>#w1 \<and> u=lbl u1@w1 \<and> (p', \<gamma>) \<hookrightarrow> (p'', u1)"
     using p''u_def p'w_def step.hyps(1) step_relp_def2 by auto
-  then obtain \<gamma> w1 u1 where \<gamma>_w1_u1_p: "w=\<gamma>#w1 \<and> u=op_labels u1@w1 \<and> (p', \<gamma>) \<hookrightarrow> (p'', u1)"
+  then obtain \<gamma> w1 u1 where \<gamma>_w1_u1_p: "w=\<gamma>#w1 \<and> u=lbl u1@w1 \<and> (p', \<gamma>) \<hookrightarrow> (p'', u1)"
     by blast
 
-  then have "\<exists>q1. (Init p'', op_labels u1, q1) \<in> LTS.trans_star A' \<and> (q1, w1, q) \<in> LTS.trans_star A'"
+  then have "\<exists>q1. (Init p'', lbl u1, q1) \<in> LTS.trans_star A' \<and> (q1, w1, q) \<in> LTS.trans_star A'"
     using q_p LTS.trans_star_split by auto
 
-  then obtain q1 where q1_p: "(Init p'', op_labels u1, q1) \<in> LTS.trans_star A' \<and> (q1, w1, q) \<in> LTS.trans_star A'"
+  then obtain q1 where q1_p: "(Init p'', lbl u1, q1) \<in> LTS.trans_star A' \<and> (q1, w1, q) \<in> LTS.trans_star A'"
     by auto
 
   then have in_A': "(Init p', \<gamma>, q1) \<in> A'"
@@ -601,9 +601,9 @@ next
 
   note step' = step_1 step_2 step_3
 
-  from step'(2) have "\<exists>\<gamma> w' wa. w = \<gamma> # w' \<and> y = op_labels wa @ w' \<and> (p', \<gamma>) \<hookrightarrow> (p1, wa)"
+  from step'(2) have "\<exists>\<gamma> w' wa. w = \<gamma> # w' \<and> y = lbl wa @ w' \<and> (p', \<gamma>) \<hookrightarrow> (p1, wa)"
     using step_relp_def2[of p' w p1 y] by auto
-  then obtain \<gamma> w' wa where \<gamma>_w'_wa_p: " w = \<gamma> # w' \<and> y = op_labels wa @ w' \<and> (p', \<gamma>) \<hookrightarrow> (p1, wa)"
+  then obtain \<gamma> w' wa where \<gamma>_w'_wa_p: " w = \<gamma> # w' \<and> y = lbl wa @ w' \<and> (p', \<gamma>) \<hookrightarrow> (p1, wa)"
     by metis
   then have "(p, u @ v) \<Rightarrow>\<^sup>* (p1, y @ v)"
     by (metis (no_types, lifting) PDS.step_relp_def2 append.assoc append_Cons rtranclp.simps step_3)
@@ -639,7 +639,7 @@ next
   from step(2) obtain p1 \<gamma> p2 w2 q' where p1_\<gamma>_p2_w2_q'_p:
     "Ai = Aiminus1 \<union> {(Init p1, \<gamma>, q')}"
     "(p1, \<gamma>) \<hookrightarrow> (p2, w2)"
-    "(Init p2, op_labels w2, q') \<in> LTS.trans_star Aiminus1"
+    "(Init p2, lbl w2, q') \<in> LTS.trans_star Aiminus1"
     "(Init p1, \<gamma>, q') \<notin> Aiminus1"
     by (meson pre_star_rule.cases)
 
@@ -683,20 +683,20 @@ next
 
     note IX = p1_\<gamma>_p2_w2_q'_p(2)
     note III = p1_\<gamma>_p2_w2_q'_p(3)
-    from III have III_2: "\<exists>w2_ss. (Init p2, op_labels w2, w2_ss, q') \<in> LTS.trans_star_states Aiminus1"
-      using LTS.trans_star_trans_star_states[of "Init p2" "op_labels w2" q' Aiminus1] by auto
-    then obtain w2_ss where III_2: "(Init p2, op_labels w2, w2_ss, q') \<in> LTS.trans_star_states Aiminus1"
+    from III have III_2: "\<exists>w2_ss. (Init p2, lbl w2, w2_ss, q') \<in> LTS.trans_star_states Aiminus1"
+      using LTS.trans_star_trans_star_states[of "Init p2" "lbl w2" q' Aiminus1] by auto
+    then obtain w2_ss where III_2: "(Init p2, lbl w2, w2_ss, q') \<in> LTS.trans_star_states Aiminus1"
       by blast
 
     from III have V: 
-      "(Init p2, op_labels w2, w2_ss, q') \<in> LTS.trans_star_states Aiminus1" 
+      "(Init p2, lbl w2, w2_ss, q') \<in> LTS.trans_star_states Aiminus1" 
       "(q', v, v_ss, q) \<in> LTS.trans_star_states Ai"
       using III_2 \<open>(q', v, v_ss, q) \<in> LTS.trans_star_states Ai\<close> by auto
 
-    define w2v where "w2v = op_labels w2 @ v"
+    define w2v where "w2v = lbl w2 @ v"
     define w2v_ss where "w2v_ss = w2_ss @ tl v_ss"
 
-    from V(1) have "(Init p2, op_labels w2, w2_ss, q') \<in> LTS.trans_star_states Ai"
+    from V(1) have "(Init p2, lbl w2, w2_ss, q') \<in> LTS.trans_star_states Ai"
       using trans_star_states_mono p1_\<gamma>_p2_w2_q'_p(1) using Un_iff subsetI by (metis (no_types))
     then have V_merged: "(Init p2, w2v, w2v_ss, q) \<in> LTS.trans_star_states Ai"
       using V(2) unfolding w2v_def w2v_ss_def by (meson LTS.trans_star_states_append)
@@ -720,13 +720,13 @@ next
       then have "j' = countts (q', v, v_ss, q)"
         by auto
       moreover
-      have "countts (Init p2, op_labels w2, w2_ss, q') = 0"
+      have "countts (Init p2, lbl w2, w2_ss, q') = 0"
         using III_2 LTS.avoid_count_zero countts_def p1_\<gamma>_p2_w2_q'_p(4) t_def by fastforce
       moreover
-      have "(Init p2, w2v, w2v_ss, q) = (Init p2, op_labels w2, w2_ss, q') @@\<acute> (q', v, v_ss, q)"
+      have "(Init p2, w2v, w2v_ss, q) = (Init p2, lbl w2, w2_ss, q') @@\<acute> (q', v, v_ss, q)"
         using w2v_def w2v_ss_def by auto
-      then have "countts (Init p2, w2v, w2v_ss, q) = countts (Init p2, op_labels w2, w2_ss, q') + countts (q', v, v_ss, q)"
-        using \<open>(Init p2, op_labels w2, w2_ss, q') \<in> LTS.trans_star_states Ai\<close> count_append_trans_star_states countts_def t_def u_v_u_ss_v_ss_p(4) by fastforce
+      then have "countts (Init p2, w2v, w2v_ss, q) = countts (Init p2, lbl w2, w2_ss, q') + countts (q', v, v_ss, q)"
+        using \<open>(Init p2, lbl w2, w2_ss, q') \<in> LTS.trans_star_states Ai\<close> count_append_trans_star_states countts_def t_def u_v_u_ss_v_ss_p(4) by fastforce
       ultimately
       show ?thesis
         by (simp add: countts_def)
@@ -944,9 +944,9 @@ next
     using LTS_\<epsilon>.trans_star_\<epsilon>_iff_\<epsilon>_exp_trans_star[of "Init p''" u q A'] by auto
   then obtain u_\<epsilon> where II: "q \<in> finals" "LTS_\<epsilon>.\<epsilon>_exp u_\<epsilon> u" "(Init p'', u_\<epsilon>, q) \<in> LTS.trans_star A'"
     by blast
-  have "\<exists>\<gamma> u1 w1. u=\<gamma>#u1 \<and> w=op_labels w1@u1 \<and> (p'', \<gamma>) \<hookrightarrow> (p', w1)"
+  have "\<exists>\<gamma> u1 w1. u=\<gamma>#u1 \<and> w=lbl w1@u1 \<and> (p'', \<gamma>) \<hookrightarrow> (p', w1)"
     using p''u_def p'w_def step.hyps(2) step_relp_def2 by auto
-  then obtain \<gamma> u1 w1 where III: "u=\<gamma>#u1" "w=op_labels w1@u1" "(p'', \<gamma>) \<hookrightarrow> (p', w1)"
+  then obtain \<gamma> u1 w1 where III: "u=\<gamma>#u1" "w=lbl w1@u1" "(p'', \<gamma>) \<hookrightarrow> (p', w1)"
     by blast
 
   have p'_inits: "Init p' \<in> inits"
@@ -996,7 +996,7 @@ next
     then have "(Init p', Some \<gamma>', q1) \<in> A'"
       by (metis VI_2(1) add_trans_swap assms(3) saturated_def saturation_def)
     have "(Init p', w, q) \<in> LTS_\<epsilon>.trans_star_\<epsilon> A'"
-      using III(2) LTS_\<epsilon>.trans_star_\<epsilon>.trans_star_\<epsilon>_step_\<gamma> VI_2(2) append_Cons append_self_conv2 op_labels.simps(3) swap
+      using III(2) LTS_\<epsilon>.trans_star_\<epsilon>.trans_star_\<epsilon>_step_\<gamma> VI_2(2) append_Cons append_self_conv2 lbl.simps(3) swap
       using \<open>(Init p', Some \<gamma>', q1) \<in> A'\<close> by fastforce
     then have "accepts_\<epsilon> A' (p', w)"
       unfolding accepts_\<epsilon>_def
@@ -1474,7 +1474,7 @@ next
             by (metis Cons_eq_appendI LTS_\<epsilon>.remove_\<epsilon>_append_dist self_append_conv2) 
           from rule steps' have "(p2,  \<gamma>2 # (LTS_\<epsilon>.remove_\<epsilon> (tl w))) \<Rightarrow>\<^sup>* (p, LTS_\<epsilon>.remove_\<epsilon> (tl w))"
             using  VIII
-            by (metis PDS.transition_rel.intros append_self_conv2 op_labels.simps(1) r_into_rtranclp step_relp_def) (* VII *) 
+            by (metis PDS.transition_rel.intros append_self_conv2 lbl.simps(1) r_into_rtranclp step_relp_def) (* VII *) 
           then have "(p2, LTS_\<epsilon>.remove_\<epsilon> (\<gamma>2' @ tl w)) \<Rightarrow>\<^sup>* (p, LTS_\<epsilon>.remove_\<epsilon> (tl w))"
             by (simp add: LTS_\<epsilon>.remove_\<epsilon>_append_dist \<gamma>2'_\<gamma>2)
           ultimately
@@ -1494,7 +1494,7 @@ next
           by (metis LTS_\<epsilon>.\<epsilon>_exp_def LTS_\<epsilon>.remove_\<epsilon>_append_dist LTS_\<epsilon>.remove_\<epsilon>_def \<open>LTS_\<epsilon>.\<epsilon>_exp \<gamma>2' [\<gamma>2] \<and> (Init p2, \<gamma>2', q1) \<in> LTS.trans_star Aiminus1\<close> \<open>is_Isolated q\<close> append_Cons append_self_conv2 w_tl_\<epsilon>)
           
         then have "(the_Ctr_Loc q, [the_Label q]) \<Rightarrow>\<^sup>* (p1, LTS_\<epsilon>.remove_\<epsilon> w)"
-          using VI by (metis append_Nil op_labels.simps(1) rtranclp.simps step_relp_def2) 
+          using VI by (metis append_Nil lbl.simps(1) rtranclp.simps step_relp_def2) 
         then have "(the_Ctr_Loc q, [the_Label q]) \<Rightarrow>\<^sup>* (p, LTS_\<epsilon>.remove_\<epsilon> w)"
           using VII by auto
         then show ?thesis
@@ -1644,7 +1644,7 @@ next
             by (metis Cons_eq_appendI LTS_\<epsilon>.remove_\<epsilon>_append_dist self_append_conv2) 
           from rule steps' have "(p2,  \<gamma>2 # (LTS_\<epsilon>.remove_\<epsilon> (tl w))) \<Rightarrow>\<^sup>* (p, \<gamma>' # LTS_\<epsilon>.remove_\<epsilon> (tl w))"
             using  VIII
-            using PDS.transition_rel.intros append_self_conv2 op_labels.simps(1) r_into_rtranclp step_relp_def
+            using PDS.transition_rel.intros append_self_conv2 lbl.simps(1) r_into_rtranclp step_relp_def
             by fastforce
           then have "(p2, LTS_\<epsilon>.remove_\<epsilon> (\<gamma>2' @ tl w)) \<Rightarrow>\<^sup>* (p, \<gamma>' # LTS_\<epsilon>.remove_\<epsilon> (tl w))"
             by (simp add: LTS_\<epsilon>.remove_\<epsilon>_append_dist \<gamma>2'_\<gamma>2)
@@ -1667,7 +1667,7 @@ next
           by (metis LTS_\<epsilon>.\<epsilon>_exp_def LTS_\<epsilon>.remove_\<epsilon>_append_dist LTS_\<epsilon>.remove_\<epsilon>_def \<open>LTS_\<epsilon>.\<epsilon>_exp \<gamma>2' [\<gamma>2] \<and> (Init p2, \<gamma>2', q1) \<in> LTS.trans_star Aiminus1\<close> append_Cons append_self_conv2)
         then have "(the_Ctr_Loc q, [the_Label q]) \<Rightarrow>\<^sup>* (p1, \<gamma>' # LTS_\<epsilon>.remove_\<epsilon> (tl w))"
           using VI
-          by (metis (no_types) append_Cons append_Nil op_labels.simps(2) rtranclp.rtrancl_into_rtrancl step_relp_def2)
+          by (metis (no_types) append_Cons append_Nil lbl.simps(2) rtranclp.rtrancl_into_rtrancl step_relp_def2)
         then have "(the_Ctr_Loc q, [the_Label q]) \<Rightarrow>\<^sup>* (p, \<gamma>' # LTS_\<epsilon>.remove_\<epsilon> (tl w))"
           using VII by auto
         then show ?thesis
@@ -1872,7 +1872,7 @@ next
             by (metis LTS_\<epsilon>.\<epsilon>_exp_def LTS_\<epsilon>.remove_\<epsilon>_append_dist LTS_\<epsilon>.remove_\<epsilon>_def append_Cons self_append_conv2) 
           moreover
           from XIII have "(p2, \<gamma>2 #(LTS_\<epsilon>.remove_\<epsilon> v)) \<Rightarrow>\<^sup>* (p1, \<gamma>1#\<gamma>''#LTS_\<epsilon>.remove_\<epsilon> v)"
-            by (metis PDS.transition_rel.intros append_Cons append_Nil op_labels.simps(3) r_into_rtranclp step_relp_def)
+            by (metis PDS.transition_rel.intros append_Cons append_Nil lbl.simps(3) r_into_rtranclp step_relp_def)
           ultimately
           show "(p2, LTS_\<epsilon>.remove_\<epsilon> (\<gamma>2\<epsilon> @ v)) \<Rightarrow>\<^sup>* (p1, \<gamma>1#\<gamma>''#LTS_\<epsilon>.remove_\<epsilon> v)"
             by auto
@@ -1889,7 +1889,7 @@ next
           using ind state.exhaust_disc
           by blast
         have p2_\<gamma>2\<epsilon>v_p1_\<gamma>1\<gamma>''v: "(p2, LTS_\<epsilon>.remove_\<epsilon> (\<gamma>2\<epsilon> @ v))  \<Rightarrow>\<^sup>* (p1, \<gamma>1 # \<gamma>'' # LTS_\<epsilon>.remove_\<epsilon> v)"
-          by (metis (mono_tags) LTS_\<epsilon>.\<epsilon>_exp_def LTS_\<epsilon>.remove_\<epsilon>_append_dist LTS_\<epsilon>.remove_\<epsilon>_def XIII XI_1 append_Cons append_Nil op_labels.simps(3) r_into_rtranclp step_relp_def2)
+          by (metis (mono_tags) LTS_\<epsilon>.\<epsilon>_exp_def LTS_\<epsilon>.remove_\<epsilon>_append_dist LTS_\<epsilon>.remove_\<epsilon>_def XIII XI_1 append_Cons append_Nil lbl.simps(3) r_into_rtranclp step_relp_def2)
           
         have p1_\<gamma>1\<gamma>''_v_p_u\<gamma>''v: "(p1, \<gamma>1 # \<gamma>'' # LTS_\<epsilon>.remove_\<epsilon> v) \<Rightarrow>\<^sup>* (p, LTS_\<epsilon>.remove_\<epsilon> u @ \<gamma>'' # LTS_\<epsilon>.remove_\<epsilon> v)"
           by (metis p1_\<gamma>1_p_u append_Cons append_Nil step_relp_append)
