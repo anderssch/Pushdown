@@ -2076,7 +2076,9 @@ definition accepts_inters :: "(('ctr_loc, 'noninit, 'label) state * ('ctr_loc, '
 lemma accepts_inters_accepts_aut_inters:
   assumes "ts12 = inters ts1 ts2"
   assumes "finals12 = inters_finals finals1 finals2"
-  shows "accepts_inters ts12 finals12 (p,w) \<longleftrightarrow> Intersection_P_Automaton.accepts_aut_inters ts1 PDS_with_P_automata.inits finals1 ts2 finals2 (Init p) w"
+  shows "accepts_inters ts12 finals12 (p,w) \<longleftrightarrow>
+         Intersection_P_Automaton.accepts_aut_inters ts1 PDS_with_P_automata.inits finals1 ts2
+            finals2 (Init p) w"
   by (simp add: Intersection_P_Automaton.accepts_aut_inters_def PDS_with_P_automata.inits_def 
       P_Automaton.accepts_aut_def accepts_inters_def assms)
 
@@ -2086,7 +2088,8 @@ definition lang_inters :: "(('ctr_loc, 'noninit, 'label) state * ('ctr_loc, 'non
 lemma lang_inters_lang_aut_inters:
   assumes "ts12 = inters ts1 ts2"
   assumes "finals12 = inters_finals finals1 finals2"
-  shows "(\<lambda>(p,w). (Init p, w)) ` lang_inters ts12 finals12 = Intersection_P_Automaton.lang_aut_inters ts1  PDS_with_P_automata.inits finals1 ts2 finals2"
+  shows "(\<lambda>(p,w). (Init p, w)) ` lang_inters ts12 finals12 =
+         Intersection_P_Automaton.lang_aut_inters ts1  PDS_with_P_automata.inits finals1 ts2 finals2"
   using assms
   by (auto simp: Intersection_P_Automaton.lang_aut_inters_def
     Intersection_P_Automaton.inters_accept_iff
@@ -2109,18 +2112,24 @@ term PDS_with_P_automata.finals
 
 lemma inters_accept_iff: 
   assumes "ts12 = inters ts1 ts2"
-  assumes "finals12 = inters_finals (PDS_with_P_automata.finals final_initss1 final_noninits1) (PDS_with_P_automata.finals final_initss2 final_noninits2)"
+  assumes "finals12 = inters_finals (PDS_with_P_automata.finals final_initss1 final_noninits1) 
+                        (PDS_with_P_automata.finals final_initss2 final_noninits2)"
   shows
   "accepts_inters ts12 finals12 (p,w) \<longleftrightarrow> 
      PDS_with_P_automata.accepts final_initss1 final_noninits1 ts1 (p,w) \<and> 
      PDS_with_P_automata.accepts final_initss2 final_noninits2 ts2 (p,w)"
   using accepts_inters_accepts_aut_inters Intersection_P_Automaton.inters_accept_iff assms
-  by (simp add: Intersection_P_Automaton.inters_accept_iff accepts_inters_accepts_aut_inters PDS_with_P_automata.accepts_accepts_aut) 
+  by (simp add: Intersection_P_Automaton.inters_accept_iff accepts_inters_accepts_aut_inters 
+      PDS_with_P_automata.accepts_accepts_aut) 
 
 lemma inters_lang:
   assumes "ts12 = inters ts1 ts2"
-  assumes "finals12 = inters_finals (PDS_with_P_automata.finals final_initss1 final_noninits1) (PDS_with_P_automata.finals final_initss2 final_noninits2)"
-  shows "lang_inters ts12 finals12 = PDS_with_P_automata.lang final_initss1 final_noninits1 ts1 \<inter> PDS_with_P_automata.lang final_initss2 final_noninits2 ts2"
+  assumes "finals12 = 
+             inters_finals (PDS_with_P_automata.finals final_initss1 final_noninits1) 
+               (PDS_with_P_automata.finals final_initss2 final_noninits2)"
+  shows "lang_inters ts12 finals12 = 
+           PDS_with_P_automata.lang final_initss1 final_noninits1 ts1 \<inter> 
+           PDS_with_P_automata.lang final_initss2 final_noninits2 ts2"
   using assms by (auto simp add: PDS_with_P_automata.lang_def inters_accept_iff lang_inters_def)
 
 
