@@ -156,11 +156,11 @@ lemma path_with_word_length:
   assumes "(ss, w) \<in> path_with_word"
   shows "length ss = length w + 1"
   using assms 
-proof (induction rule: LTS.path_with_word.induct[OF assms(1)])
-  case (1 s)
+proof (induction rule: path_with_word.induct)
+  case (path_with_word_refl s)
   then show ?case by auto
 next
-  case (2 ss s w l s')
+  case (path_with_word_step s' ss w s l)
   then show ?case by auto
 qed
 
@@ -175,8 +175,9 @@ lemma path_with_word_butlast:
   assumes "(ss, w) \<in> path_with_word"
   assumes "length ss \<ge> 2"
   shows "(butlast ss, butlast w) \<in> path_with_word"
-using assms proof (induction rule: path_with_word.induct)
-case (path_with_word_refl s)
+  using assms 
+proof (induction rule: path_with_word.induct)
+  case (path_with_word_refl s)
   then show ?case
     by force
 next
@@ -192,7 +193,8 @@ lemma transition_butlast:
   assumes "(ss, w) \<in> path_with_word"
   assumes "length ss \<ge> 2"
   shows "(last (butlast ss), last w, last ss) \<in> transition_relation"
-using assms proof (induction rule: path_with_word.induct)
+  using assms 
+proof (induction rule: path_with_word.induct)
   case (path_with_word_refl s)
   then show ?case
     by force 
@@ -203,8 +205,7 @@ next
         butlast.simps(2) last.simps length_Cons length_greater_0_conv list.distinct(1) list.size(4))
 qed
 
-
-lemma path_with_word_induct_reverse:
+lemma path_with_word_induct_reverse [consumes 1, case_names path_with_word_refl path_with_word_step_rev]:
   "(ss, w) \<in> path_with_word \<Longrightarrow>
    (\<And>s. P [s] []) \<Longrightarrow>
    (\<And>ss s w l s'. (ss @ [s], w) \<in> path_with_word \<Longrightarrow> 
@@ -439,7 +440,8 @@ lemma path_with_word_trans_star_Singleton:
 lemma trans_star_split:
   assumes "(p'', u1 @ w1, q) \<in> trans_star"
   shows "\<exists>q1. (p'', u1, q1) \<in> trans_star \<and> (q1, w1, q) \<in> trans_star"
-using assms proof(induction u1 arbitrary: p'')
+  using assms
+proof(induction u1 arbitrary: p'')
   case Nil
   then show ?case by auto
 next
@@ -452,13 +454,14 @@ lemma trans_star_states_append:
   assumes "(p2, w2, w2_ss, q') \<in> trans_star_states"
   assumes "(q', v, v_ss, q) \<in> trans_star_states"
   shows "(p2, w2 @ v, w2_ss @ tl v_ss, q) \<in> trans_star_states"
-using assms proof (induction rule: LTS.trans_star_states.induct[OF assms(1)])
-  case (1 p)
-  then show ?case
+  using assms 
+proof (induction rule: trans_star_states.induct)
+  case (trans_star_states_refl p)
+  then show ?case 
     by (metis append_Cons append_Nil list.sel(3) trans_star_states.simps)
 next
-  case (2 p \<gamma> q' w ss q)
-  then show ?case
+  case (trans_star_states_step p \<gamma> q' w ss q)
+  then show ?case 
     using LTS.trans_star_states.trans_star_states_step by fastforce 
 qed
 
@@ -466,13 +469,13 @@ lemma trans_star_states_length:
   assumes "(p, u, u_ss, p1) \<in> trans_star_states"
   shows "length u_ss = Suc (length u)"
   using assms
-proof (induction rule: LTS.trans_star_states.induct[OF assms(1)])
-  case (1 p)
-  then show ?case
+proof (induction rule: trans_star_states.induct)
+  case (trans_star_states_refl p)
+  then show ?case 
     by simp
 next
-  case (2 p \<gamma> q' w ss q)
-  then show ?case
+  case (trans_star_states_step p \<gamma> q' w ss q)
+  then show ?case 
     by simp
 qed
 
@@ -480,13 +483,13 @@ lemma trans_star_states_last:
   assumes "(p, u, u_ss, p1) \<in> trans_star_states"
   shows "p1 = last u_ss"
   using assms 
-proof (induction rule: LTS.trans_star_states.induct[OF assms(1)])
-  case (1 p)
-  then show ?case
+proof (induction rule: trans_star_states.induct)
+  case (trans_star_states_refl p)
+  then show ?case 
     by simp
 next
-  case (2 p \<gamma> q' w ss q)
-  then show ?case
+  case (trans_star_states_step p \<gamma> q' w ss q)
+  then show ?case 
     using LTS.trans_star_states.cases by force
 qed
 
@@ -494,20 +497,21 @@ lemma trans_star_states_hd:
   assumes "(q', v, v_ss, q) \<in> trans_star_states"
   shows "q' = hd v_ss"
   using assms 
-proof (induction rule: LTS.trans_star_states.induct[OF assms(1)])
-  case (1 p)
-  then show ?case
+proof (induction rule: trans_star_states.induct)
+  case (trans_star_states_refl p)
+  then show ?case 
     by simp
 next
-  case (2 p \<gamma> q' w ss q)
-  then show ?case
+  case (trans_star_states_step p \<gamma> q' w ss q)
+  then show ?case 
     by force
 qed
 
 lemma trans_star_states_transition_relation: 
   assumes "(p, \<gamma>#w_rest, ss, q) \<in> trans_star_states"
   shows "\<exists>s \<gamma>'. (s, \<gamma>', q) \<in> transition_relation"
-using assms proof (induction w_rest arbitrary: ss p \<gamma>)
+  using assms
+proof (induction w_rest arbitrary: ss p \<gamma>)
   case Nil
   then show ?case
     by (metis LTS.trans_star_empty LTS.trans_star_states_trans_star trans_star_cons)
@@ -520,7 +524,8 @@ qed
 lemma trans_star_states_path_with_word:
   assumes "(p, w, ss, q) \<in> trans_star_states"
   shows "(ss,w) \<in> path_with_word"
-using assms proof (induction rule: trans_star_states.induct)
+  using assms 
+proof (induction rule: trans_star_states.induct)
   case (trans_star_states_refl p)
   then show ?case by auto
 next
@@ -534,7 +539,8 @@ lemma path_with_word_trans_star_states:
   assumes "p = hd ss"
   assumes "q = last ss"
   shows "(p, w, ss, q) \<in> trans_star_states"
-using assms proof (induction arbitrary: p q rule: path_with_word.induct)
+  using assms 
+proof (induction arbitrary: p q rule: path_with_word.induct)
   case (path_with_word_refl s)
   then show ?case
     by simp
@@ -558,13 +564,13 @@ lemma hd_is_hd:
   assumes "transition_list' (p, w, ss, q) \<noteq> []"
   shows "p = p1"
   using assms 
-proof (induction rule: LTS.trans_star_states.inducts[OF assms(1)])
-  case (1 p)
-  then show ?case
-    by auto 
+proof (induction rule: trans_star_states.inducts)
+  case (trans_star_states_refl p)
+  then show ?case 
+    by auto
 next
-  case (2 p \<gamma> q' w ss q)
-  then show ?case
+  case (trans_star_states_step p \<gamma> q' w ss q)
+  then show ?case 
     by (metis LTS.trans_star_states.simps Pair_inject list.sel(1) transition_list'.simps 
         transition_list.simps(1))
 qed
@@ -598,12 +604,12 @@ lemma source_never_or_hd:
   shows "count (transitions_of (ss, w)) t = 0 \<or>
            ((hd (transition_list (ss, w)) = t \<and> count (transitions_of (ss, w)) t = 1))"
   using assms
-proof (induction rule: LTS.path_with_word.induct[OF assms(1)])
-  case (1 s)
+proof (induction rule: path_with_word.induct)
+  case (path_with_word_refl s)
   then show ?case
     by simp
 next
-  case (2 s' ss w s l)
+  case (path_with_word_step s' ss w s l)
   then have "count (transitions_of (s' # ss, w)) t = 0 \<or>
     (hd (transition_list (s' # ss, w)) = t \<and> count (transitions_of (s' # ss, w)) t = 1)"
     by auto
@@ -615,13 +621,13 @@ next
       case True
       then have "hd (transition_list (s # s' # ss, l # w)) = t \<and> 
                  count (transitions_of (s # s' # ss, l # w)) t = 1"
-        using 2 asm by simp
+        using path_with_word_step asm by simp
       then show ?thesis
         by auto
     next
       case False
       then have "count (transitions_of (s # s' # ss, l # w)) t = 0"
-        using 2 asm by auto
+        using path_with_word_step asm by auto
       then show ?thesis
         by auto
     qed
@@ -632,8 +638,7 @@ next
       by (meson LTS.srcs_def2 assms(2))
     ultimately
     have False
-      using 2(1,2) unfolding 2(6)
-      by (auto elim: path_with_word.cases)
+      using path_with_word_step by (auto elim: path_with_word.cases)
     then show ?case
       by auto
   qed
@@ -653,13 +658,13 @@ lemma no_end_in_source:
   assumes "w \<noteq> []"
   shows "qq \<notin> srcs"
   using assms
-proof (induction rule: LTS.trans_star.induct[OF assms(1)])
-  case (1 p)
-  then show ?case
+proof (induction rule: trans_star.induct)
+  case (trans_star_refl p)
+  then show ?case    
     by blast
 next
-  case (2 p \<gamma> q' w q)
-  then show ?case
+  case (trans_star_step p \<gamma> q' w q)
+  then show ?case 
     by (metis LTS.srcs_def2 LTS.trans_star_empty)
 qed
 
@@ -708,15 +713,15 @@ lemma nothing_after_sink:
   assumes "q' \<in> sinks"
   shows "ss = [] \<and> w = []"
   using assms 
-proof (induction rule: LTS.path_with_word.induct[OF assms(1)])
-  case (1 s)
-  from 1 have "\<nexists>q'' \<gamma>. (q', \<gamma>, q'') \<in> transition_relation"
+proof (induction rule: path_with_word.induct)
+  case (path_with_word_refl s)
+  then have "\<nexists>q'' \<gamma>. (q', \<gamma>, q'') \<in> transition_relation"
     using sinks_def2[of "q'"]
     by auto
   with assms(1) show ?case
     by (auto elim: path_with_word.cases)
 next
-  case (2 s' ss w s l)
+  case (path_with_word_step s' ss w s l)
   then show ?case
     by metis
 qed
@@ -732,16 +737,14 @@ lemma avoid_count_zero:
   assumes "(p1, \<gamma>, q') \<notin> transition_relation"
   shows "count (transitions_of' (p, w, ss, q)) (p1, \<gamma>, q') = 0"
   using assms
-proof(induction arbitrary: p rule: LTS.trans_star_states.induct[OF assms(1)])
-  case (1 p_add p)
+proof(induction arbitrary: p rule: trans_star_states.induct)
+  case (trans_star_states_refl p)
   then show ?case
     by auto
 next
-  case (2 p_add \<gamma>' q'_add w ss q p)
-  then have p_add_p: "p_add = p"
-    by (meson trans_star_states.cases list.inject)
+  case (trans_star_states_step p \<gamma> q' w ss q)
   show ?case
-    by (metis "2.IH" "2.hyps"(1) "2.hyps"(2) trans_star_states.cases assms(2) 
+    by (metis trans_star_states_step trans_star_states.cases assms(2) 
         count_transitions_of'_tails transitions_of'.simps)
 qed
 
@@ -751,15 +754,15 @@ lemma transition_list_append:
   assumes "last ss = hd ss'"
   shows "transition_list ((ss,w) @\<acute> (ss',w')) = transition_list (ss,w) @ transition_list (ss',w')"
   using assms 
-proof (induction rule: LTS.path_with_word.induct[OF assms(1)])
-  case (1 s)
+proof (induction rule: path_with_word.induct)
+  case (path_with_word_refl s)
   then have "transition_list (hd ss' # tl ss', w') = transition_list (ss', w')"
     by (metis LTS.path_with_word_not_empty list.exhaust_sel)
   then show ?case
-    using 1 by auto
+    using path_with_word_refl by auto
 next
-  case (2 s' ss w s l)
-  then show ?case
+  case (path_with_word_step s' ss w s l)
+  then show ?case 
     by auto
 qed
 
@@ -770,37 +773,39 @@ lemma split_path_with_word_beginning'':
   assumes "WW = w @ w'"
   shows "(ss,w) \<in> path_with_word"
   using assms
-proof (induction arbitrary: ss ss' w w' rule: LTS.path_with_word.induct[OF assms(1)])
-  case (1 s)
+proof (induction arbitrary: ss ss' w w' rule: path_with_word.induct)
+  case (path_with_word_refl s)
   then show ?case
-    by (metis (full_types) Suc_length_conv append_is_Nil_conv hd_append2 length_0_conv list.sel(1))
+    by (metis append.right_neutral append_is_Nil_conv list.sel(3) list.size(3) nat.discI 
+        path_with_word.path_with_word_refl tl_append2)
 next
-  case (2 s'a ssa wa s l)
+  case (path_with_word_step s'a ssa wa s l)
   then show ?case
   proof (cases "w")
     case Nil
     then show ?thesis
-      using 2
-      by (metis LTS.path_with_word.simps length_0_conv length_Suc_conv)
+      using path_with_word_step by (metis LTS.path_with_word.simps length_0_conv length_Suc_conv)
   next
     case (Cons)
     have "(s'a # ssa, wa) \<in> LTS.path_with_word transition_relation"
-      by (simp add: "2.hyps"(1))
+      by (simp add: "path_with_word_step.hyps"(1))
     moreover
     have "s'a # ssa = tl ss @ ss'"
-      by (metis "2.prems"(2) "2.prems"(3) Zero_not_Suc length_0_conv list.sel(3) tl_append2)
+      by (metis "path_with_word_step.prems"(1,2) Zero_not_Suc 
+          length_0_conv list.sel(3) tl_append2)
     moreover
     have "length (tl ss) = Suc (length (tl w))"
-      using "2.prems"(3) Cons by auto
+      using "path_with_word_step.prems" Cons by auto
     moreover
     have "wa = tl w @ w'"
-      by (metis "2.prems"(3) "2.prems"(4) calculation(3) length_Suc_conv list.sel(3) list.size(3) 
+      by (metis path_with_word_step(5,6) calculation(3) length_Suc_conv list.sel(3) list.size(3) 
           nat.simps(3) tl_append2)
     ultimately
     have "(tl ss, tl w) \<in> LTS.path_with_word transition_relation"
-      using 2(3)[of "tl ss" ss' "tl w" w'] by auto
+      using path_with_word_step(3)[of "tl ss" ss' "tl w" w'] by auto
     then show ?thesis
-      using 2(2,5,6,7) by (auto simp: Cons_eq_append_conv intro: path_with_word_step)
+      using path_with_word_step
+      by (auto simp: Cons_eq_append_conv intro: path_with_word.path_with_word_step)
   qed
 qed
 
@@ -821,7 +826,7 @@ next
   proof (cases "ss")
     case Nil
     then show ?thesis
-      using 2(4-7) path_with_word_length
+      using 2(4,5,6,7) path_with_word_length
       by (auto simp: Cons_eq_append_conv)
   next
     case (Cons x xs)
@@ -885,13 +890,13 @@ lemma path_with_word_remove_last':
   assumes "W = w @ [l]"
   shows "(ss @ [s], w) \<in> path_with_word"
   using assms
-proof (induction arbitrary: ss w rule: LTS.path_with_word_induct_reverse[OF assms(1)])
-  case (1 s)
+proof (induction arbitrary: ss w rule: path_with_word_induct_reverse)
+  case (path_with_word_refl s)
   then show ?case 
     by auto
 next
-  case (2 ss' s w' l s')
-  then show ?case
+  case (path_with_word_step_rev ss s w l s')
+  then show ?case 
     by auto
 qed
 
@@ -1441,7 +1446,8 @@ definition rev_edge_list :: "('n,'v) transition list \<Rightarrow> ('n,'v) trans
 lemma rev_path_in_rev_pg:
   assumes "(ss, w) \<in> LTS.path_with_word edge_set"
   shows "(rev ss, rev w) \<in> LTS.path_with_word (rev_edge ` edge_set)"
-using assms proof (induction rule: LTS.path_with_word_induct_reverse[OF assms])
+  using assms 
+proof (induction rule: LTS.path_with_word_induct_reverse[OF assms])
   case (1 s)
   show ?case
     by (simp add: LTS.path_with_word.path_with_word_refl)
@@ -1788,7 +1794,8 @@ definition \<epsilon>_exp :: "'label option list \<Rightarrow> 'label list \<Rig
 lemma trans_star_trans_star_\<epsilon>:
   assumes "(p, w, q) \<in> trans_star"
   shows "(p, map the (removeAll \<epsilon> w), q) \<in> trans_star_\<epsilon>"
-using assms proof (induction rule: trans_star.induct)
+  using assms 
+proof (induction rule: trans_star.induct)
   case (trans_star_refl p)
   then show ?case
     by simp
