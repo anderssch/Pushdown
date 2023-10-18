@@ -97,22 +97,32 @@ inductive_set path :: "'state list set" where
 | "(s'#ss) \<in> path \<Longrightarrow> (s,l,s') \<in> transition_relation \<Longrightarrow> s#s'#ss \<in> path"
 
 inductive_set trans_star :: "('state * 'label list * 'state) set" where
-  trans_star_refl[iff]: "(p, [], p) \<in> trans_star"
-| trans_star_step: "(p,\<gamma>,q') \<in> transition_relation \<Longrightarrow> (q',w,q) \<in> trans_star
-                           \<Longrightarrow> (p, \<gamma>#w, q) \<in> trans_star"
+  trans_star_refl[iff]: 
+  "(p, [], p) \<in> trans_star"
+| trans_star_step: 
+  "(p,\<gamma>,q') \<in> transition_relation \<Longrightarrow> 
+   (q',w,q) \<in> trans_star \<Longrightarrow> 
+   (p, \<gamma>#w, q) \<in> trans_star"
 
 inductive_cases trans_star_empty [elim]: "(p, [], q) \<in> trans_star"
 inductive_cases trans_star_cons: "(p, \<gamma>#w, q) \<in> trans_star"
 
 
 inductive_set trans_star_states :: "('state * 'label list * 'state list * 'state) set" where
-  trans_star_states_refl[iff]: "(p,[],[p],p) \<in> trans_star_states"
-| trans_star_states_step: "(p,\<gamma>,q') \<in> transition_relation \<Longrightarrow> (q',w,ss,q) \<in> trans_star_states
-                           \<Longrightarrow> (p, \<gamma>#w, p#ss, q) \<in> trans_star_states"
+  trans_star_states_refl[iff]: 
+  "(p,[],[p],p) \<in> trans_star_states"
+| trans_star_states_step: 
+  "(p,\<gamma>,q') \<in> transition_relation \<Longrightarrow> 
+   (q',w,ss,q) \<in> trans_star_states \<Longrightarrow> 
+   (p, \<gamma>#w, p#ss, q) \<in> trans_star_states"
 
 inductive_set path_with_word :: "('state list * 'label list) set" where
-  path_with_word_refl[iff]: "([s],[]) \<in> path_with_word"
-| path_with_word_step: "(s'#ss, w) \<in> path_with_word \<Longrightarrow> (s,l,s') \<in> transition_relation \<Longrightarrow> (s#s'#ss,l#w) \<in> path_with_word"
+  path_with_word_refl[iff]: 
+  "([s],[]) \<in> path_with_word"
+| path_with_word_step: 
+  "(s'#ss, w) \<in> path_with_word \<Longrightarrow> 
+   (s,l,s') \<in> transition_relation \<Longrightarrow> 
+   (s#s'#ss,l#w) \<in> path_with_word"
 
 definition start_of :: "('state list \<times> 'label list) \<Rightarrow> 'state" where
   "start_of \<pi> = hd (fst \<pi>)"
@@ -130,8 +140,11 @@ abbreviation path_with_word_from_to :: "'state \<Rightarrow> 'state \<Rightarrow
   "path_with_word_from_to start end == {\<pi>. \<pi> \<in> path_with_word \<and> start_of \<pi> = start \<and> end_of \<pi> = end}"
 
 inductive_set transition_list_path :: "('state, 'label) transition list set" where
-  "(q, l, q') \<in> transition_relation \<Longrightarrow> [(q, l, q')] \<in> transition_list_path"
-| "(q, l, q') \<in> transition_relation \<Longrightarrow> (q', l', q'') # ts \<in> transition_list_path \<Longrightarrow> (q, l, q') # (q', l', q'') # ts \<in> transition_list_path"
+  "(q, l, q') \<in> transition_relation \<Longrightarrow> 
+   [(q, l, q')] \<in> transition_list_path"
+| "(q, l, q') \<in> transition_relation \<Longrightarrow> 
+   (q', l', q'') # ts \<in> transition_list_path \<Longrightarrow> 
+   (q, l, q') # (q', l', q'') # ts \<in> transition_list_path"
 
 lemma singleton_path_start_end:
   assumes "([s], []) \<in> LTS.path_with_word pg"
@@ -154,7 +167,9 @@ qed
 lemma path_with_word_lengths:
   assumes "(qs @ [qnminus1], w) \<in> path_with_word"
   shows "length qs = length w"
-  using assms by (metis LTS.path_with_word_length Suc_eq_plus1 Suc_inject length_Cons length_append list.size(3) list.size(4))
+  using assms 
+  by (metis LTS.path_with_word_length Suc_eq_plus1 Suc_inject length_Cons length_append 
+      list.size(3,4))
 
 lemma path_with_word_butlast:
   assumes "(ss, w) \<in> path_with_word"
@@ -167,7 +182,10 @@ case (path_with_word_refl s)
 next
   case (path_with_word_step s' ss w s l)
   then show ?case
-    by (metis (no_types) LTS.path_with_word.path_with_word_refl LTS.path_with_word.path_with_word_step LTS.path_with_word_length One_nat_def Suc_1 Suc_inject Suc_leI Suc_le_mono butlast.simps(2) length_0_conv length_Cons list.distinct(1) list.size(4) not_gr0)
+    by (metis (no_types) LTS.path_with_word.path_with_word_refl 
+        LTS.path_with_word.path_with_word_step LTS.path_with_word_length One_nat_def Suc_1 
+        Suc_inject Suc_leI Suc_le_mono butlast.simps(2) length_0_conv length_Cons list.distinct(1) 
+        list.size(4) not_gr0)
 qed
 
 lemma transition_butlast:
@@ -181,15 +199,19 @@ using assms proof (induction rule: path_with_word.induct)
 next
   case (path_with_word_step s' ss w s l)
   then show ?case
-    by (metis (no_types) LTS.path_with_word_length One_nat_def Suc_1 Suc_inject Suc_leI Suc_le_mono butlast.simps(2) last.simps length_Cons length_greater_0_conv list.distinct(1) list.size(4))
+    by (metis (no_types) LTS.path_with_word_length One_nat_def Suc_1 Suc_inject Suc_leI Suc_le_mono 
+        butlast.simps(2) last.simps length_Cons length_greater_0_conv list.distinct(1) list.size(4))
 qed
 
 
-lemma path_with_word_induct_reverse: 
+lemma path_with_word_induct_reverse:
   "(ss, w) \<in> path_with_word \<Longrightarrow>
    (\<And>s. P [s] []) \<Longrightarrow>
-   (\<And>ss s w l s'. (ss @ [s], w) \<in> path_with_word \<Longrightarrow> P (ss @ [s]) w \<Longrightarrow> (s, l, s') \<in> transition_relation \<Longrightarrow> P (ss @ [s, s']) (w @ [l])) \<Longrightarrow>
-   P ss w"
+   (\<And>ss s w l s'. (ss @ [s], w) \<in> path_with_word \<Longrightarrow> 
+                   P (ss @ [s]) w \<Longrightarrow> 
+                   (s, l, s') \<in> transition_relation \<Longrightarrow> 
+                   P (ss @ [s, s']) (w @ [l])) 
+    \<Longrightarrow> P ss w"
 proof (induction "length ss" arbitrary: ss w)
   case 0
   then show ?case
@@ -214,20 +236,26 @@ next
       using False Suc.hyps(2) by linarith
 
     then have s_split: "ss' @ [s, s'] = ss"
-      by (metis One_nat_def Suc_1 Suc_le_mono Zero_not_Suc append.assoc append.simps(1) append_Cons append_butlast_last_id le_less length_append_singleton list.size(3) s'_def s_def ss'_def zero_order(3))
+      by (metis One_nat_def Suc_1 Suc_le_mono Zero_not_Suc append.assoc append.simps(1) append_Cons 
+          append_butlast_last_id le_less length_append_singleton list.size(3) s'_def s_def ss'_def 
+          zero_order(3))
 
     have w_split: "w' @ [l] = w"
-      by (metis LTS.path_with_word_length Suc.prems(1) add.commute butlast.simps(2) butlast_append l_def length_0_conv length_Suc_conv list.simps(3) plus_1_eq_Suc s_split snoc_eq_iff_butlast w'_def)
+      by (metis LTS.path_with_word_length Suc.prems(1) add.commute butlast.simps(2) butlast_append
+          l_def length_0_conv length_Suc_conv list.simps(3) plus_1_eq_Suc s_split 
+          snoc_eq_iff_butlast w'_def)
 
     have ss'w'_path: "(ss' @ [s], w') \<in> path_with_word"
       using Suc(3) path_with_word_butlast
-      by (metis (no_types, lifting) \<open>2 \<le> length ss\<close> butlast.simps(2) butlast_append list.simps(3) s_split w'_def)
+      by (metis (no_types, lifting) \<open>2 \<le> length ss\<close> butlast.simps(2) butlast_append list.simps(3) 
+          s_split w'_def)
 
     have tr: "(s, l, s') \<in> transition_relation"
       using Suc(3) s'_def s_def l_def transition_butlast \<open>2 \<le> length ss\<close> by presburger 
 
     have nl: "n = length (ss' @ [s])"
-      by (metis LTS.path_with_word_length Suc.hyps(2) Suc.prems(1) Suc_eq_plus1 length_append_singleton nat.inject ss'w'_path w_split)
+      by (metis LTS.path_with_word_length Suc.hyps(2) Suc.prems(1) Suc_eq_plus1 
+          length_append_singleton nat.inject ss'w'_path w_split)
 
     have "P (ss' @ [s]) w'"
       using Suc(1)[of "ss' @ [s]" w', OF nl ss'w'_path Suc(4)] Suc(5) by metis
@@ -242,8 +270,11 @@ qed
 lemma path_with_word_from_induct_reverse: 
   "(ss, w) \<in> path_with_word_from start \<Longrightarrow>
    (\<And>s. P [s] []) \<Longrightarrow>
-   (\<And>ss s w l s'. (ss @ [s], w) \<in> path_with_word_from start \<Longrightarrow> P (ss @ [s]) w \<Longrightarrow> (s, l, s') \<in> transition_relation \<Longrightarrow> P (ss @ [s, s']) (w @ [l])) \<Longrightarrow>
-   P ss w"
+   (\<And>ss s w l s'. (ss @ [s], w) \<in> path_with_word_from start \<Longrightarrow> 
+                   P (ss @ [s]) w \<Longrightarrow> 
+                   (s, l, s') \<in> transition_relation \<Longrightarrow> 
+                   P (ss @ [s, s']) (w @ [l])) 
+   \<Longrightarrow> P ss w"
 proof (induction "length ss" arbitrary: ss w)
   case 0
   then show ?case
@@ -269,17 +300,24 @@ next
       using False Suc.hyps(2) by linarith
 
     then have s_split: "ss' @ [s, s'] = ss"
-      by (metis One_nat_def Suc_1 Suc_le_mono Zero_not_Suc append.assoc append.simps(1) append_Cons append_butlast_last_id le_less length_append_singleton list.size(3) s'_def s_def ss'_def zero_order(3))
+      by (metis One_nat_def Suc_1 Suc_le_mono Zero_not_Suc append.assoc append.simps(1) append_Cons
+          append_butlast_last_id le_less length_append_singleton list.size(3) s'_def s_def ss'_def 
+          zero_order(3))
 
     have w_split: "w' @ [l] = w"
-      by (metis (no_types, lifting) False LTS.path_with_word_length One_nat_def Suc.hyps(2) Suc.prems(1) Suc_inject add.right_neutral add_Suc_right l_def list.size(3) mem_Collect_eq snoc_eq_iff_butlast w'_def)
+      by (metis (no_types, lifting) False LTS.path_with_word_length One_nat_def Suc.hyps(2) 
+          Suc.prems(1) Suc_inject add.right_neutral add_Suc_right l_def list.size(3) mem_Collect_eq 
+          snoc_eq_iff_butlast w'_def)
 
     have ss'w'_path: "(ss' @ [s], w') \<in> path_with_word"
       using Suc(3) path_with_word_butlast len_ss
-      by (metis (no_types, lifting) butlast.simps(2) butlast_append list.discI mem_Collect_eq not_Cons_self2 s_split w'_def)
+      by (metis (no_types, lifting) butlast.simps(2) butlast_append list.discI mem_Collect_eq 
+          not_Cons_self2 s_split w'_def)
 
     have ss'w'_path_from: "(ss' @ [s], w') \<in> path_with_word_from start"
-      using Suc(3) butlast.simps(2) start_of_def list.sel(1) list.simps(3) mem_Collect_eq path_with_word.simps prod.sel(1) s_def snoc_eq_iff_butlast ss'_def ss'w'_path w_split by (metis (no_types, lifting) hd_append)
+      using Suc(3) butlast.simps(2) start_of_def list.sel(1) list.simps(3) mem_Collect_eq 
+        path_with_word.simps prod.sel(1) s_def snoc_eq_iff_butlast ss'_def ss'w'_path w_split 
+      by (metis (no_types, lifting) hd_append)
 
     have tr: "(s, l, s') \<in> transition_relation"
       using Suc(3) s'_def s_def l_def transition_butlast len_ss by blast
@@ -299,11 +337,18 @@ qed
 
 inductive transition_of :: "('state, 'label) transition \<Rightarrow> 'state list * 'label list \<Rightarrow> bool" where
   "transition_of (s1,\<gamma>,s2) (s1#s2#ss, \<gamma>#w)"
-| "transition_of (s1,\<gamma>,s2) (ss, w) \<Longrightarrow> transition_of (s1,\<gamma>,s2) (s#ss, \<mu>#w)"
+| "transition_of (s1,\<gamma>,s2) (ss, w) \<Longrightarrow> 
+   transition_of (s1,\<gamma>,s2) (s#ss, \<mu>#w)"
 
-lemma path_with_word_induct_non_empty_word: "(x10, x20, x30, x40) \<in> trans_star_states \<Longrightarrow> x20 \<noteq> [] \<Longrightarrow>
-(\<And>p \<gamma> q'. (p, \<gamma>, q') \<in> transition_relation \<Longrightarrow> P p [\<gamma>] [p, q'] q') \<Longrightarrow>
-(\<And>p \<gamma> q' w ss q. (p, \<gamma>, q') \<in> transition_relation \<Longrightarrow> w \<noteq> [] \<Longrightarrow> (q', w, ss, q) \<in> trans_star_states \<Longrightarrow> P q' w ss q \<Longrightarrow> P p (\<gamma> # w) (p # ss) q) \<Longrightarrow> P x10 x20 x30 x40"
+lemma path_with_word_induct_non_empty_word: 
+  "(x10, x20, x30, x40) \<in> trans_star_states \<Longrightarrow> x20 \<noteq> [] \<Longrightarrow>
+   (\<And>p \<gamma> q'. (p, \<gamma>, q') \<in> transition_relation \<Longrightarrow> P p [\<gamma>] [p, q'] q') \<Longrightarrow>
+   (\<And>p \<gamma> q' w ss q. (p, \<gamma>, q') \<in> transition_relation \<Longrightarrow>
+                     w \<noteq> [] \<Longrightarrow> 
+                     (q', w, ss, q) \<in> trans_star_states \<Longrightarrow> 
+                     P q' w ss q \<Longrightarrow> 
+                     P p (\<gamma> # w) (p # ss) q)
+   \<Longrightarrow> P x10 x20 x30 x40"
 proof (induction rule: trans_star_states.induct)
   case (trans_star_states_refl p)
   then show ?case by auto
@@ -313,11 +358,13 @@ next
   proof (cases "w = []")
     case True
     then show ?thesis
-      by (metis LTS.trans_star_states.simps list.distinct(1) trans_star_states_step.hyps(1) trans_star_states_step.hyps(2) trans_star_states_step.prems(2))
+      by (metis LTS.trans_star_states.simps list.distinct(1) trans_star_states_step.hyps(1) 
+          trans_star_states_step.hyps(2) trans_star_states_step.prems(2))
   next
     case False
     then show ?thesis
-      using trans_star_states_step.IH trans_star_states_step.hyps(1) trans_star_states_step.hyps(2) trans_star_states_step.prems(2) trans_star_states_step.prems(3) by force
+      using trans_star_states_step.IH trans_star_states_step.hyps(1) trans_star_states_step.hyps(2) 
+        trans_star_states_step.prems(2) trans_star_states_step.prems(3) by force
   qed
 qed
                                                   
@@ -502,7 +549,8 @@ lemma append_path_with_word_path_with_word:
   assumes "(\<gamma>2ss, \<gamma>2\<epsilon>) \<in> path_with_word"
   assumes "(v_ss, v) \<in> path_with_word"
   shows "(\<gamma>2ss, \<gamma>2\<epsilon>) @\<acute> (v_ss, v) \<in> path_with_word"
-  by (metis LTS.trans_star_states_path_with_word append_path_with_word.simps path_with_word_trans_star_states assms(1) assms(2) assms(3) trans_star_states_append)
+  by (metis LTS.trans_star_states_path_with_word append_path_with_word.simps 
+      path_with_word_trans_star_states assms(1,2,3) trans_star_states_append)
 
 lemma hd_is_hd:
   assumes "(p, w, ss, q) \<in> trans_star_states"
@@ -517,7 +565,8 @@ proof (induction rule: LTS.trans_star_states.inducts[OF assms(1)])
 next
   case (2 p \<gamma> q' w ss q)
   then show ?case
-    by (metis LTS.trans_star_states.simps Pair_inject list.sel(1) transition_list'.simps transition_list.simps(1))
+    by (metis LTS.trans_star_states.simps Pair_inject list.sel(1) transition_list'.simps 
+        transition_list.simps(1))
 qed
 
 definition srcs :: "'state set" where
@@ -546,7 +595,8 @@ lemma source_never_or_hd:
   assumes "(ss, w) \<in> path_with_word"
   assumes "p1 \<in> srcs"
   assumes "t = (p1, \<gamma>, q1)"
-  shows "count (transitions_of (ss, w)) t = 0 \<or> ((hd (transition_list (ss, w)) = t \<and> count (transitions_of (ss, w)) t = 1))"
+  shows "count (transitions_of (ss, w)) t = 0 \<or>
+           ((hd (transition_list (ss, w)) = t \<and> count (transitions_of (ss, w)) t = 1))"
   using assms
 proof (induction rule: LTS.path_with_word.induct[OF assms(1)])
   case (1 s)
@@ -563,7 +613,8 @@ next
     show ?case
     proof (cases "s = p1 \<and> l = \<gamma> \<and> q1 = s'")
       case True
-      then have "hd (transition_list (s # s' # ss, l # w)) = t \<and> count (transitions_of (s # s' # ss, l # w)) t = 1"
+      then have "hd (transition_list (s # s' # ss, l # w)) = t \<and> 
+                 count (transitions_of (s # s' # ss, l # w)) t = 1"
         using 2 asm by simp
       then show ?thesis
         by auto
@@ -672,7 +723,8 @@ qed
 
 lemma count_transitions_of'_tails:
   assumes "(p, \<gamma>', q'_add) \<noteq> (p1, \<gamma>, q')"
-  shows "count (transitions_of' (p, \<gamma>' # w, p # q'_add # ss_rest, q)) (p1, \<gamma>, q') = count (transitions_of' (q'_add, w, q'_add # ss_rest, q)) (p1, \<gamma>, q')"
+  shows "count (transitions_of' (p, \<gamma>' # w, p # q'_add # ss_rest, q)) (p1, \<gamma>, q') = 
+         count (transitions_of' (q'_add, w, q'_add # ss_rest, q)) (p1, \<gamma>, q')"
   using assms by (cases w) auto
   
 lemma avoid_count_zero:
@@ -689,7 +741,8 @@ next
   then have p_add_p: "p_add = p"
     by (meson trans_star_states.cases list.inject)
   show ?case
-    by (metis "2.IH" "2.hyps"(1) "2.hyps"(2) trans_star_states.cases assms(2) count_transitions_of'_tails transitions_of'.simps)
+    by (metis "2.IH" "2.hyps"(1) "2.hyps"(2) trans_star_states.cases assms(2) 
+        count_transitions_of'_tails transitions_of'.simps)
 qed
 
 lemma transition_list_append:
@@ -741,7 +794,8 @@ next
       using "2.prems"(3) Cons by auto
     moreover
     have "wa = tl w @ w'"
-      by (metis "2.prems"(3) "2.prems"(4) calculation(3) length_Suc_conv list.sel(3) list.size(3) nat.simps(3) tl_append2)
+      by (metis "2.prems"(3) "2.prems"(4) calculation(3) length_Suc_conv list.sel(3) list.size(3) 
+          nat.simps(3) tl_append2)
     ultimately
     have "(tl ss, tl w) \<in> LTS.path_with_word transition_relation"
       using 2(3)[of "tl ss" ss' "tl w" w'] by auto
@@ -898,14 +952,15 @@ proof -
       case (Cons aa llist)
       have "p1 = a"
         using assms Cons Cons_outer
-        by (metis Pair_inject list.exhaust list.sel(1) transition_list.simps(1) transition_list.simps(2))
+        by (metis Pair_inject list.exhaust list.sel(1) transition_list.simps(1,2))
       moreover
       have "q1 # tl list = list"
         using assms Cons Cons_outer
         by (cases list) auto
       moreover
       have "\<gamma> = aa"
-        by (metis Cons_outer Pair_inject assms(1) calculation(2) list.sel(1) local.Cons transition_list.simps(1))
+        by (metis Cons_outer Pair_inject assms(1) calculation(2) list.sel(1) local.Cons 
+            transition_list.simps(1))
       ultimately
       show ?thesis
         using assms Cons_outer Cons by auto
@@ -916,14 +971,17 @@ proof -
 qed
 
 lemma counting:
-  "count (transitions_of' ((hdss1,ww1,ss1,lastss1))) (s1, \<gamma>, s2) = count (transitions_of ((ss1,ww1))) (s1, \<gamma>, s2)"
+  "count (transitions_of' ((hdss1,ww1,ss1,lastss1))) (s1, \<gamma>, s2) = 
+   count (transitions_of ((ss1,ww1))) (s1, \<gamma>, s2)"
   by force
 
 lemma count_append_path_with_word_\<gamma>:
   assumes "length ss1 = Suc (length ww1)"
   assumes "ss2 \<noteq> []"
   shows "count (transitions_of (((ss1,ww1),\<gamma>') @\<^sup>\<gamma> (ss2,ww2))) (s1, \<gamma>, s2) =
-         count (transitions_of (ss1,ww1)) (s1, \<gamma>, s2) + (if s1 = last ss1 \<and> s2 = hd ss2 \<and> \<gamma> = \<gamma>' then 1 else 0) + count (transitions_of (ss2,ww2)) (s1, \<gamma>, s2)"
+           count (transitions_of (ss1,ww1)) (s1, \<gamma>, s2) + 
+           (if s1 = last ss1 \<and> s2 = hd ss2 \<and> \<gamma> = \<gamma>' then 1 else 0) +
+           count (transitions_of (ss2,ww2)) (s1, \<gamma>, s2)"
 using assms proof (induction ww1 arbitrary: ss1)
   case Nil
   note Nil_outer = Nil
@@ -963,7 +1021,8 @@ lemma count_append_path_with_word:
   assumes "ss2 \<noteq> []"
   assumes "last ss1 = hd ss2"
   shows "count (transitions_of (((ss1, ww1)) @\<acute> (ss2, ww2))) (s1, \<gamma>, s2) =
-         count (transitions_of (ss1, ww1)) (s1, \<gamma>, s2) + count (transitions_of (ss2, ww2)) (s1, \<gamma>, s2)"
+           count (transitions_of (ss1, ww1)) (s1, \<gamma>, s2) + 
+           count (transitions_of (ss2, ww2)) (s1, \<gamma>, s2)"
 using assms proof (induction ww1 arbitrary: ss1)
   case Nil
   note Nil_outer = Nil
@@ -999,14 +1058,18 @@ lemma count_append_trans_star_states_\<gamma>_length:
   assumes "length (ss1) = Suc (length (ww1))"
   assumes "ss2 \<noteq> []"
   shows "count (transitions_of' (((hdss1,ww1,ss1,lastss1),\<gamma>') @@\<^sup>\<gamma> (hdss2,ww2,ss2,lastss2))) (s1, \<gamma>, s2) =
-         count (transitions_of' (hdss1,ww1,ss1,lastss1)) (s1, \<gamma>, s2) + (if s1 = last ss1 \<and> s2 = hd ss2 \<and> \<gamma> = \<gamma>' then 1 else 0) + count (transitions_of' (hdss2,ww2,ss2,lastss2)) (s1, \<gamma>, s2)"
+           count (transitions_of' (hdss1,ww1,ss1,lastss1)) (s1, \<gamma>, s2) + 
+           (if s1 = last ss1 \<and> s2 = hd ss2 \<and> \<gamma> = \<gamma>' then 1 else 0) + 
+           count (transitions_of' (hdss2,ww2,ss2,lastss2)) (s1, \<gamma>, s2)"
   using assms count_append_path_with_word_\<gamma> by force
 
 lemma count_append_trans_star_states_\<gamma>:
   assumes "(hdss1,ww1,ss1,lastss1) \<in> LTS.trans_star_states A"
   assumes "(hdss2,ww2,ss2,lastss2) \<in> LTS.trans_star_states A"
   shows "count (transitions_of' (((hdss1,ww1,ss1,lastss1),\<gamma>') @@\<^sup>\<gamma> (hdss2,ww2,ss2,lastss2))) (s1, \<gamma>, s2) =
-         count (transitions_of' (hdss1,ww1,ss1,lastss1)) (s1, \<gamma>, s2) + (if s1 = last ss1 \<and> s2 = hd ss2 \<and> \<gamma> = \<gamma>' then 1 else 0) + count (transitions_of' (hdss2,ww2,ss2,lastss2)) (s1, \<gamma>, s2)"
+           count (transitions_of' (hdss1,ww1,ss1,lastss1)) (s1, \<gamma>, s2) + 
+           (if s1 = last ss1 \<and> s2 = hd ss2 \<and> \<gamma> = \<gamma>' then 1 else 0) + 
+           count (transitions_of' (hdss2,ww2,ss2,lastss2)) (s1, \<gamma>, s2)"
 proof -
   have "length (ss1) = Suc (length (ww1))"
     by (meson LTS.trans_star_states_length assms(1))
@@ -1023,14 +1086,16 @@ lemma count_append_trans_star_states_length:
   assumes "ss2 \<noteq> []"
   assumes "last ss1 = hd ss2"
   shows "count (transitions_of' (((hdss1,ww1,ss1,lastss1)) @@\<acute> (hdss2,ww2,ss2,lastss2))) (s1, \<gamma>, s2) =
-         count (transitions_of' (hdss1,ww1,ss1,lastss1)) (s1, \<gamma>, s2) + count (transitions_of' (hdss2,ww2,ss2,lastss2)) (s1, \<gamma>, s2)"
+           count (transitions_of' (hdss1,ww1,ss1,lastss1)) (s1, \<gamma>, s2) + 
+           count (transitions_of' (hdss2,ww2,ss2,lastss2)) (s1, \<gamma>, s2)"
   using count_append_path_with_word[OF assms(1) assms(2) assms(3), of ww2 s1 \<gamma> s2] by auto
 
 lemma count_append_trans_star_states:
   assumes "(hdss1,ww1,ss1,lastss1) \<in> LTS.trans_star_states A"
   assumes "(lastss1,ww2,ss2,lastss2) \<in> LTS.trans_star_states A"
   shows "count (transitions_of' (((hdss1,ww1,ss1,lastss1)) @@\<acute> (lastss1,ww2,ss2,lastss2))) (s1, \<gamma>, s2) =
-         count (transitions_of' (hdss1,ww1,ss1,lastss1)) (s1, \<gamma>, s2) + count (transitions_of' (lastss1,ww2,ss2,lastss2)) (s1, \<gamma>, s2)"
+           count (transitions_of' (hdss1,ww1,ss1,lastss1)) (s1, \<gamma>, s2) + 
+           count (transitions_of' (lastss1,ww2,ss2,lastss2)) (s1, \<gamma>, s2)"
 proof -
   have "length (ss1) = Suc (length (ww1))"
     by (meson LTS.trans_star_states_length assms(1))
@@ -1158,7 +1223,8 @@ next
       using ss_hd_tl "2.hyps"(2) using LTS.trans_star_states.cases
       by (metis list.sel(1))
     ultimately have "(hd ss, w, ss, q) \<in> LTS.trans_star_states Aiminus1"
-      using ss_hd_tl using "2.IH" "2.prems"(2) not_found assms(3) p_is_p' LTS.count_transitions_of'_tails by (metis) 
+      using ss_hd_tl using "2.IH" "2.prems"(2) not_found assms(3) p_is_p' 
+        LTS.count_transitions_of'_tails by (metis) 
     from this t_Aiminus1 have ?case
       using LTS.trans_star_states.intros(2)[of p \<gamma>' "hd ss" Aiminus1 w ss q] using p_is_p' by auto
   }
@@ -1223,7 +1289,9 @@ next
     have "(q', v, v_ss, q) \<in> LTS.trans_star_states Ai"
       using 2(2) True v_def v_ss_def by blast
     show ?thesis
-      using Pair_inject True \<open>(p, u, u_ss, p1) \<in> LTS.trans_star_states Aiminus1\<close> \<open>(p1, [\<gamma>], q') \<in> LTS.trans_star Ai\<close> \<open>(q', v, v_ss, q) \<in> LTS.trans_star_states Ai\<close> append_Cons p_add_p self_append_conv2 u_def u_ss_def v_def v_ss_def
+      using Pair_inject True \<open>(p, u, u_ss, p1) \<in> LTS.trans_star_states Aiminus1\<close> 
+        \<open>(p1, [\<gamma>], q') \<in> LTS.trans_star Ai\<close> \<open>(q', v, v_ss, q) \<in> LTS.trans_star_states Ai\<close> 
+        append_Cons p_add_p self_append_conv2 u_def u_ss_def v_def v_ss_def
       by (metis (no_types) append_trans_star_states_\<gamma>.simps)
   next
     case False
@@ -1231,7 +1299,12 @@ next
       by (metis LTS.trans_star_states.cases 2(2) list.sel(1))
     from this False have g: "Suc j' = count (transitions_of' (q'_add, w, ss, q)) (p1, \<gamma>, q')"
       using count_p_\<gamma>'_w_ss by (cases ss) auto
-    have "\<exists>u_ih v_ih u_ss_ih v_ss_ih. ss = u_ss_ih @ v_ss_ih \<and> w = u_ih @ [\<gamma>] @ v_ih \<and> (q'_add, u_ih, u_ss_ih, p1) \<in> LTS.trans_star_states Aiminus1 \<and> (p1, [\<gamma>], q') \<in> LTS.trans_star Ai \<and> (q', v_ih, v_ss_ih, q) \<in> LTS.trans_star_states Ai"
+    have "\<exists>u_ih v_ih u_ss_ih v_ss_ih. 
+            ss = u_ss_ih @ v_ss_ih \<and> 
+            w = u_ih @ [\<gamma>] @ v_ih \<and> 
+            (q'_add, u_ih, u_ss_ih, p1) \<in> LTS.trans_star_states Aiminus1 \<and> 
+            (p1, [\<gamma>], q') \<in> LTS.trans_star Ai \<and> 
+            (q', v_ih, v_ss_ih, q) \<in> LTS.trans_star_states Ai"
       using 2(3)[of q'_add, OF 2(2) g 2(6) 2(7)] by auto
     then obtain u_ih v_ih u_ss_ih v_ss_ih where splitting_p:
       "ss = u_ss_ih @ v_ss_ih" 
@@ -1249,13 +1322,16 @@ next
     have "\<gamma>' # w = u @ [\<gamma>] @ v"
       using splitting_p(2) u_def v_def by auto
     have "(p, u, u_ss, p1) \<in> LTS.trans_star_states Aiminus1"
-      using False LTS.trans_star_states.trans_star_states_step 2(7) p_Ai splitting_p(3) u_def u_ss_def by fastforce
+      using False LTS.trans_star_states.trans_star_states_step 2(7) p_Ai splitting_p(3) u_def 
+        u_ss_def by fastforce
     have "(p1, [\<gamma>], q') \<in> LTS.trans_star Ai"
       by (simp add: splitting_p(4))
     have "(q', v, v_ss, q) \<in> LTS.trans_star_states Ai"
       by (simp add: splitting_p(5) v_def v_ss_def)
     show ?thesis
-      using \<open>(p, u, u_ss, p1) \<in> LTS.trans_star_states Aiminus1\<close> \<open>(q', v, v_ss, q) \<in> LTS.trans_star_states Ai\<close> \<open>\<gamma>' # w = u @ [\<gamma>] @ v\<close> \<open>p_add # ss = u_ss @ v_ss\<close> splitting_p(4)
+      using \<open>(p, u, u_ss, p1) \<in> LTS.trans_star_states Aiminus1\<close>
+        \<open>(q', v, v_ss, q) \<in> LTS.trans_star_states Ai\<close> \<open>\<gamma>' # w = u @ [\<gamma>] @ v\<close>
+        \<open>p_add # ss = u_ss @ v_ss\<close> splitting_p(4)
       by auto
   qed
 qed
@@ -1280,7 +1356,10 @@ lemma count_combine_trans_star_states_append:
   assumes "t = (p1, \<gamma>, q')"
   assumes "(p, u, u_ss, p1) \<in> LTS.trans_star_states A"
   assumes "(q', v, v_ss, q) \<in> LTS.trans_star_states B"
-  shows "count (transitions_of' (p, w, ss, q)) t = count (transitions_of' (p, u, u_ss, p1)) t + 1 + count (transitions_of' (q', v, v_ss, q)) t"
+  shows "count (transitions_of' (p, w, ss, q)) t = 
+           count (transitions_of' (p, u, u_ss, p1)) t + 
+           1 + 
+           count (transitions_of' (q', v, v_ss, q)) t"
 proof -
   have v_ss_non_empt: "v_ss \<noteq> []"
     using LTS.trans_star_states.cases assms by force
@@ -1309,7 +1388,6 @@ lemma count_combine_trans_star_states:
         count (transitions_of' (p, u, u_ss, p1)) t + 1 + count (transitions_of' (q', v, v_ss, q)) t"
   by (metis append_trans_star_states_\<gamma>.simps assms count_combine_trans_star_states_append)
 
-
 lemma transition_list_reversed_simp:
   assumes "length ss = length w"
   shows "transition_list (ss @ [s, s'], w @ [l]) = (transition_list (ss@[s],w)) @ [(s,l,s')]"
@@ -1329,7 +1407,7 @@ next
   then have "transition_list (ss @ [s, s'], w' @ [l]) = transition_list (ss @ [s], w') @ [(s, l, s')]"
     using Cons(1)[of w'] by auto
   then have "transition_list (a # ss @ [s, s'], l' # w' @ [l]) = transition_list (a # ss @ [s], l' # w') @ [(s, l, s')]"
-    by (cases ss) auto 
+    by (cases ss) auto
   then show ?case
     using w_split by auto
 qed
@@ -1342,7 +1420,8 @@ lemma path_with_word_mono':
   assumes "(ss, w) \<in> LTS.path_with_word A1"
   assumes "A1 \<subseteq> A2"
   shows "(ss, w) \<in> LTS.path_with_word A2"
-  by (meson LTS.trans_star_states_path_with_word LTS.path_with_word_trans_star_states assms(1) assms(2) trans_star_states_mono)
+  by (meson LTS.trans_star_states_path_with_word LTS.path_with_word_trans_star_states assms(1,2) 
+      trans_star_states_mono)
 
 lemma LTS_path_with_word_mono:
   "mono LTS.path_with_word"
@@ -1420,8 +1499,10 @@ section \<open>Automata\<close>
 
 subsection \<open>P-Automaton locale\<close>
 
-locale P_Automaton = LTS transition_relation for transition_relation :: "('state::finite, 'label) transition set" +
-  fixes initials :: "'state set" and finals :: "'state set"
+locale P_Automaton = LTS transition_relation 
+  for transition_relation :: "('state::finite, 'label) transition set" +
+  fixes initials :: "'state set"
+    and finals :: "'state set"
 begin
 
 definition accepts_aut :: "'state \<Rightarrow> 'label list \<Rightarrow> bool" where
@@ -1480,7 +1561,8 @@ next
   proof (cases "J = {}")
     case True
     then have "q' \<in> get_visited ms"
-      by (smt (z3) DiffI Diff_disjoint Int_iff J_def SUP_bot_conv(2) case_prod_conv insertI1 step.hyps(1) step.prems(2) step.prems(3))
+      by (smt (z3) DiffI Diff_disjoint Int_iff J_def SUP_bot_conv(2) case_prod_conv insertI1 
+          step.hyps(1) step.prems(2) step.prems(3))
     with True show ?thesis
       using step(1,2,4,5,7)
       by (subst mark.simps)
@@ -1492,7 +1574,8 @@ next
       by (auto simp: J_def split: if_splits)
     then have "p \<in> get_visited ms \<Longrightarrow> (p, \<gamma>, q) \<in> transition_relation \<Longrightarrow> q \<notin> get_visited ms \<Longrightarrow> q \<in> J" for p \<gamma> q
       using step(5)
-      by (cases "p \<in> get_next ms") (auto simp only: J_def simp_thms if_True if_False intro!: UN_I[of "(p, \<gamma>, q)"])
+      by (cases "p \<in> get_next ms") 
+        (auto simp only: J_def simp_thms if_True if_False intro!: UN_I[of "(p, \<gamma>, q)"])
     with False show ?thesis
       using step(1,4,5,6,7)
       by (subst mark.simps)
@@ -1520,8 +1603,12 @@ subsection \<open>Intersection P-Automaton locale\<close>
 locale Intersection_P_Automaton = 
   A1: P_Automaton ts1 initials finals1 +
   A2: P_Automaton ts2 initials finals2
-  for ts1 :: "('state :: finite, 'label) transition set" and initials :: "'state set" and finals1 :: "'state set" and
-   ts2 :: "('state, 'label) transition set" and finals2 :: "'state set" begin
+  for ts1 :: "('state :: finite, 'label) transition set" 
+    and initials :: "'state set" 
+    and finals1 :: "'state set" 
+    and ts2 :: "('state, 'label) transition set" 
+    and finals2 :: "'state set" 
+begin
 
 sublocale pa: P_Automaton "inters ts1 ts2" "(\<lambda>x. (x,x)) `  initials" "inters_finals finals1 finals2"
   .
@@ -1632,13 +1719,15 @@ lemma inters_accept_iff: "accepts_aut_inters p w \<longleftrightarrow> A1.accept
 proof
   assume "accepts_aut_inters p w"
   then show "A1.accepts_aut p w \<and> A2.accepts_aut p w"
-    unfolding accepts_aut_inters_def A1.accepts_aut_def A2.accepts_aut_def pa.accepts_aut_def unfolding inters_finals_def 
+    unfolding accepts_aut_inters_def A1.accepts_aut_def A2.accepts_aut_def pa.accepts_aut_def 
+    unfolding inters_finals_def 
     using inters_trans_star_iff[of p _ w _ ]
     using SigmaE fst_conv inters_trans_star inters_trans_star1 snd_conv
     by (metis (no_types, lifting) imageE)
 next
   assume a: "A1.accepts_aut p w \<and> A2.accepts_aut p w"
-  then have "(\<exists>q\<in>finals1. p \<in> initials \<and> (p, w, q) \<in> A1.trans_star) \<and> (\<exists>q\<in>finals2. p \<in> initials \<and> (p, w, q) \<in> A2.trans_star)" 
+  then have "(\<exists>q\<in>finals1. p \<in> initials \<and> (p, w, q) \<in> A1.trans_star) \<and> 
+             (\<exists>q\<in>finals2. p \<in> initials \<and> (p, w, q) \<in> A2.trans_star)" 
     unfolding A1.accepts_aut_def A2.accepts_aut_def by auto
   then show "accepts_aut_inters p w"
     unfolding accepts_aut_inters_def pa.accepts_aut_def inters_finals_def
@@ -1665,9 +1754,10 @@ private abbreviation \<epsilon> :: "'label option" where
   "\<epsilon> == None"
 
 definition inters_\<epsilon> :: "('state, 'label option) transition set \<Rightarrow> ('state, 'label option) transition set \<Rightarrow> (('state * 'state), 'label option) transition set" where
-  "inters_\<epsilon> ts1 ts2 = {((p1, q1), \<alpha>, (p2, q2)) | p1 q1 \<alpha> p2 q2. (p1, \<alpha>, p2) \<in> ts1 \<and> (q1, \<alpha>, q2) \<in> ts2} \<union>
-                   {((p1, q1), \<epsilon>, (p2, q1)) | p1 p2 q1. (p1, \<epsilon>, p2) \<in> ts1} \<union>
-                   {((p1, q1), \<epsilon>, (p1, q2)) | p1 q1 q2. (q1, \<epsilon>, q2) \<in> ts2}"
+  "inters_\<epsilon> ts1 ts2 = 
+     {((p1, q1), \<alpha>, (p2, q2)) | p1 q1 \<alpha> p2 q2. (p1, \<alpha>, p2) \<in> ts1 \<and> (q1, \<alpha>, q2) \<in> ts2} \<union>
+     {((p1, q1), \<epsilon>, (p2, q1)) | p1 p2 q1. (p1, \<epsilon>, p2) \<in> ts1} \<union>
+     {((p1, q1), \<epsilon>, (p1, q2)) | p1 q1 q2. (q1, \<epsilon>, q2) \<in> ts2}"
 
 end
 
@@ -1817,7 +1907,8 @@ lemma no_edge_to_source_\<epsilon>:
   shows "qq \<notin> srcs"
 proof -
   have "\<exists>w. LTS_\<epsilon>.\<epsilon>_exp w [\<gamma>] \<and> (p, w, qq) \<in> trans_star \<and> w \<noteq> []"
-    by (metis (no_types) LTS_\<epsilon>.\<epsilon>_exp_def LTS_\<epsilon>.\<epsilon>_exp_split' LTS_\<epsilon>.trans_star_\<epsilon>_iff_\<epsilon>_exp_trans_star append_Cons append_Nil assms(1) list.distinct(1) list.exhaust)
+    by (metis (no_types) LTS_\<epsilon>.\<epsilon>_exp_def LTS_\<epsilon>.\<epsilon>_exp_split' LTS_\<epsilon>.trans_star_\<epsilon>_iff_\<epsilon>_exp_trans_star 
+        append_Cons append_Nil assms(1) list.distinct(1) list.exhaust)
   then obtain w where "LTS_\<epsilon>.\<epsilon>_exp w [\<gamma>] \<and> (p, w, qq) \<in> trans_star \<and> w \<noteq> []"
     by blast
   then show ?thesis
@@ -1852,26 +1943,41 @@ lemma append_edge_edge_trans_star_\<epsilon>:
   using assms by (metis trans_star_\<epsilon>_step_\<gamma> append_Cons append_Nil)
 
 inductive_set trans_star_states_\<epsilon> :: "('state * 'label list * 'state list * 'state) set" where
-  trans_star_states_\<epsilon>_refl[iff]: "(p,[],[p],p) \<in> trans_star_states_\<epsilon>"
-| trans_star_states_\<epsilon>_step_\<gamma>: "(p,Some \<gamma>,q') \<in> transition_relation \<Longrightarrow> (q',w,ss,q) \<in> trans_star_states_\<epsilon>
-                           \<Longrightarrow> (p, \<gamma>#w, p#ss, q) \<in> trans_star_states_\<epsilon>"
-| trans_star_states_\<epsilon>_step_\<epsilon>: "(p, \<epsilon> ,q') \<in> transition_relation \<Longrightarrow> (q',w,ss,q) \<in> trans_star_states_\<epsilon>
-                           \<Longrightarrow> (p, w, p#ss, q) \<in> trans_star_states_\<epsilon>"
+  trans_star_states_\<epsilon>_refl[iff]: 
+  "(p,[],[p],p) \<in> trans_star_states_\<epsilon>"
+| trans_star_states_\<epsilon>_step_\<gamma>: 
+  "(p,Some \<gamma>,q') \<in> transition_relation \<Longrightarrow> 
+   (q',w,ss,q) \<in> trans_star_states_\<epsilon> \<Longrightarrow> 
+   (p, \<gamma>#w, p#ss, q) \<in> trans_star_states_\<epsilon>"
+| trans_star_states_\<epsilon>_step_\<epsilon>: 
+  "(p, \<epsilon> ,q') \<in> transition_relation \<Longrightarrow> 
+   (q',w,ss,q) \<in> trans_star_states_\<epsilon> \<Longrightarrow> 
+(p, w, p#ss, q) \<in> trans_star_states_\<epsilon>"
 
 inductive_set path_with_word_\<epsilon> :: "('state list * 'label list) set" where
-  path_with_word_\<epsilon>_refl[iff]: "([s],[]) \<in> path_with_word_\<epsilon>"
-| path_with_word_\<epsilon>_step_\<gamma>: "(s'#ss, w) \<in> path_with_word_\<epsilon> \<Longrightarrow> (s,Some l,s') \<in> transition_relation \<Longrightarrow> (s#s'#ss,l#w) \<in> path_with_word_\<epsilon>"
-| path_with_word_\<epsilon>_step_\<epsilon>: "(s'#ss, w) \<in> path_with_word_\<epsilon> \<Longrightarrow> (s,\<epsilon>,s') \<in> transition_relation \<Longrightarrow> (s#s'#ss,w) \<in> path_with_word_\<epsilon>"
+  path_with_word_\<epsilon>_refl[iff]: 
+  "([s],[]) \<in> path_with_word_\<epsilon>"
+| path_with_word_\<epsilon>_step_\<gamma>: 
+  "(s'#ss, w) \<in> path_with_word_\<epsilon> \<Longrightarrow> 
+   (s,Some l,s') \<in> transition_relation \<Longrightarrow> 
+   (s#s'#ss,l#w) \<in> path_with_word_\<epsilon>"
+| path_with_word_\<epsilon>_step_\<epsilon>: 
+  "(s'#ss, w) \<in> path_with_word_\<epsilon> \<Longrightarrow> 
+   (s,\<epsilon>,s') \<in> transition_relation \<Longrightarrow>
+   (s#s'#ss,w) \<in> path_with_word_\<epsilon>"
 
 lemma \<epsilon>_exp_Some_length:
   assumes "\<epsilon>_exp (Some \<alpha> # w1') w"
   shows "0 < length w"
-  using assms by (metis LTS_\<epsilon>.\<epsilon>_exp_def length_greater_0_conv list.map(2) neq_Nil_conv option.simps(3) removeAll.simps(2))
+  using assms 
+  by (metis LTS_\<epsilon>.\<epsilon>_exp_def length_greater_0_conv list.map(2) neq_Nil_conv option.simps(3)
+      removeAll.simps(2))
 
 lemma \<epsilon>_exp_Some_hd:
   assumes "\<epsilon>_exp (Some \<alpha> # w1') w"
   shows "hd w = \<alpha>"
-  using assms by (metis LTS_\<epsilon>.\<epsilon>_exp_def list.sel(1) list.simps(9) option.sel option.simps(3) removeAll.simps(2)) 
+  using assms 
+  by (metis LTS_\<epsilon>.\<epsilon>_exp_def list.sel(1) list.simps(9) option.sel option.simps(3) removeAll.simps(2)) 
 
 lemma exp_empty_empty:
   assumes "\<epsilon>_exp [] w"
@@ -1938,8 +2044,12 @@ subsection \<open>Intersection P-Automaton with epsilon locale\<close>
 locale Intersection_P_Automaton_\<epsilon> = 
   A1: P_Automaton_\<epsilon> ts1 finals1 initials +
   A2: P_Automaton_\<epsilon> ts2 finals2 initials
-  for ts1 :: "('state :: finite, 'label option) transition set" and finals1 :: "'state set" and initials :: "'state set" and
-   ts2 :: "('state, 'label option) transition set" and finals2 :: "'state set" begin
+  for ts1 :: "('state :: finite, 'label option) transition set" 
+    and finals1 :: "'state set" 
+    and initials :: "'state set" 
+    and ts2 :: "('state, 'label option) transition set" 
+    and finals2 :: "'state set" 
+begin
 
 abbreviation \<epsilon> :: "'label option" where
   "\<epsilon> == None"
@@ -1987,10 +2097,12 @@ proof (induction "length w1 + length w2" arbitrary: w1 w2 w p1 q1 rule: less_ind
         using True'(1) True'(2) by simp
       moreover
       have "LTS_\<epsilon>.\<epsilon>_exp w1' w'"
-        by (metis (no_types) LTS_\<epsilon>.\<epsilon>_exp_def less(2) True'(1) list.map(2) list.sel(3) option.simps(3) removeAll.simps(2) w'_def)
+        by (metis (no_types) LTS_\<epsilon>.\<epsilon>_exp_def less(2) True'(1) list.map(2) list.sel(3) 
+            option.simps(3) removeAll.simps(2) w'_def)
       moreover
       have "LTS_\<epsilon>.\<epsilon>_exp w2' w'"
-        by (metis (no_types) LTS_\<epsilon>.\<epsilon>_exp_def less(3) True'(2) list.map(2) list.sel(3) option.simps(3) removeAll.simps(2) w'_def)
+        by (metis (no_types) LTS_\<epsilon>.\<epsilon>_exp_def less(3) True'(2) list.map(2) list.sel(3)
+            option.simps(3) removeAll.simps(2) w'_def)
       moreover
       have "(p', w1', p2) \<in> A1.trans_star"
         using p'_p by simp
@@ -2120,7 +2232,8 @@ proof (induction "length w1 + length w2" arbitrary: w1 w2 w p1 q1 rule: less_ind
             using False_outer_outer False_outer_outer_outer False_outer_outer_outer_outer
             by (metis neq_Nil_conv option.exhaust_sel)
           then show ?thesis
-            by (metis LTS_\<epsilon>.\<epsilon>_exp_def LTS_\<epsilon>.\<epsilon>_exp_Some_length less.prems(1) less.prems(2) less_numeral_extra(3) list.simps(8) list.size(3) removeAll.simps(1))
+            by (metis LTS_\<epsilon>.\<epsilon>_exp_def LTS_\<epsilon>.\<epsilon>_exp_Some_length less.prems(1) less.prems(2) 
+                less_numeral_extra(3) list.simps(8) list.size(3) removeAll.simps(1))
         qed
       qed
     qed
@@ -2319,20 +2432,24 @@ next
 qed
 
 lemma inters_trans_star_\<epsilon>_iff:
-  "((p1,q2), w :: 'label list, (p2,q2)) \<in> pa.trans_star_\<epsilon> \<longleftrightarrow> (p1, w, p2) \<in> A1.trans_star_\<epsilon> \<and> (q2, w, q2) \<in> A2.trans_star_\<epsilon>"
+  "((p1,q2), w :: 'label list, (p2,q2)) \<in> pa.trans_star_\<epsilon> \<longleftrightarrow> 
+   (p1, w, p2) \<in> A1.trans_star_\<epsilon> \<and> (q2, w, q2) \<in> A2.trans_star_\<epsilon>"
   by (metis fst_conv inters_trans_star_\<epsilon> inters_trans_star_\<epsilon>1 snd_conv trans_star_\<epsilon>_inter)
 
-lemma inters_\<epsilon>_accept_\<epsilon>_iff: "accepts_aut_inters_\<epsilon> p w \<longleftrightarrow> A1.accepts_aut_\<epsilon> p w \<and> A2.accepts_aut_\<epsilon> p w"
+lemma inters_\<epsilon>_accept_\<epsilon>_iff: 
+  "accepts_aut_inters_\<epsilon> p w \<longleftrightarrow> A1.accepts_aut_\<epsilon> p w \<and> A2.accepts_aut_\<epsilon> p w"
 proof
   assume "accepts_aut_inters_\<epsilon> p w"
   then show "A1.accepts_aut_\<epsilon> p w \<and> A2.accepts_aut_\<epsilon> p w"
-    unfolding accepts_aut_inters_\<epsilon>_def A1.accepts_aut_\<epsilon>_def A2.accepts_aut_\<epsilon>_def pa.accepts_aut_\<epsilon>_def unfolding inters_finals_def 
+    unfolding accepts_aut_inters_\<epsilon>_def A1.accepts_aut_\<epsilon>_def A2.accepts_aut_\<epsilon>_def pa.accepts_aut_\<epsilon>_def 
+    unfolding inters_finals_def 
     using inters_trans_star_\<epsilon>_iff[of p _ w _ ]
     using SigmaE fst_conv inters_trans_star_\<epsilon> inters_trans_star_\<epsilon>1 snd_conv
     by (metis (no_types, lifting) imageE)
 next
   assume a: "A1.accepts_aut_\<epsilon> p w \<and> A2.accepts_aut_\<epsilon> p w"
-  then have "(\<exists>q\<in>finals1. p \<in> initials \<and> (p, w, q) \<in> A1.trans_star_\<epsilon>) \<and> (\<exists>q\<in>finals2. p \<in> initials \<and> (p, w, q) \<in> LTS_\<epsilon>.trans_star_\<epsilon> ts2)" 
+  then have "(\<exists>q\<in>finals1. p \<in> initials \<and> (p, w, q) \<in> A1.trans_star_\<epsilon>) \<and> 
+             (\<exists>q\<in>finals2. p \<in> initials \<and> (p, w, q) \<in> LTS_\<epsilon>.trans_star_\<epsilon> ts2)" 
     unfolding A1.accepts_aut_\<epsilon>_def A2.accepts_aut_\<epsilon>_def by auto
   then show "accepts_aut_inters_\<epsilon> p w"
     unfolding accepts_aut_inters_\<epsilon>_def pa.accepts_aut_\<epsilon>_def inters_finals_def
