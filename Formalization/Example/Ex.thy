@@ -1,5 +1,5 @@
 theory Ex
-  imports "../PDS_Code"
+  imports PDS.PDS_Code
 begin
 
 (* Query specific part START *)

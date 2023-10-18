@@ -2048,7 +2048,7 @@ lemma inters_lang:
   using assms by (auto simp add: PDS_with_P_automata.lang_def inters_accept_iff lang_inters_def)
 
 
-subsection \<open>Intersection \<epsilon>-Automata\<close>
+subsection \<open>Intersection epsilon-Automata\<close>
 
 context PDS_with_P_automata begin
 

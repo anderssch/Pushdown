@@ -5,6 +5,10 @@ session PDS (PDS) = "Deriving" +
     LTS
     PDS
     PDS_Code
+  document_files
+    "root.bib"
+    "root.tex"
 
-session GoodExample (PDS) in GoodExample = "PDS" + theories Ex
-session BadExample (PDS) in BadExample = "PDS" + theories Ex
+
+session Example (PDS) in Example = "PDS" +
+  theories Ex
