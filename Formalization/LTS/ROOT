@@ -1,0 +1,8 @@
+chapter LTS
+
+session LTS (LTS) = "Deriving" +
+  theories
+    LTS
+  document_files
+    "root.bib"
+    "root.tex"

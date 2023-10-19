@@ -1,4 +1,4 @@
-theory PDS imports "LTS" "HOL-Library.While_Combinator" begin
+theory PDS imports "P_Automata" "HOL-Library.While_Combinator" begin
 
 
 

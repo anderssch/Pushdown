@@ -1,0 +1,63 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amssymb}
+\usepackage[left=2.25cm,right=2.25cm,top=2.25cm,bottom=2.75cm]{geometry}
+\usepackage{graphicx}
+\usepackage{isabelle}
+\usepackage{isabellesym}
+\usepackage[only,bigsqcap]{stmaryrd}
+\usepackage{pdfsetup}
+
+\urlstyle{tt}
+\isabellestyle{it}
+
+\renewcommand{\isacharunderscore}{\_}
+\renewcommand{\isachardoublequoteopen}{``}
+\renewcommand{\isachardoublequoteclose}{''}
+
+\begin{document}
+
+\title{TITLE}
+\author{Anders Schlichtkrull, Morten Konggaard Schou, Ji\v{r}\'i Srba and Dmitriy Traytel}
+\date{}
+
+\maketitle
+
+\begin{abstract}
+\noindent
+ABSTRACT
+
+\cite{schwoon2002model}
+
+
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+% sane default for proof documents
+\parindent 0pt
+\parskip 0.5ex
+
+\section{Introduction}
+INTRO
+
+\begin{figure}
+\begin{center}
+  \includegraphics[width=0.2\textwidth,keepaspectratio]{session_graph}
+\end{center}
+\caption{Theory dependency graph}
+\label{fig:thys}
+\end{figure}
+
+\newpage
+
+% generated text of all theories
+\input{session}
+
+% optional bibliography
+\bibliographystyle{alpha}
+\bibliography{root}
+
+\end{document}

@@ -2,7 +2,7 @@ chapter PDS
 
 session PDS (PDS) = "Deriving" +
   theories
-    LTS
+    P_Automata
     PDS
     PDS_Code
   document_files
