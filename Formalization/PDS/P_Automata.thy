@@ -6,21 +6,28 @@ subsection \<open>P-Automaton locale\<close>
 
 locale P_Automaton = LTS transition_relation 
   for transition_relation :: "('state::finite, 'label) transition set" +
-  fixes initials :: "'state set"
+  fixes Init :: "'ctr_loc::enum \<Rightarrow> 'state"
     and finals :: "'state set"
 begin
 
-definition accepts_aut :: "'state \<Rightarrow> 'label list \<Rightarrow> bool" where
-  "accepts_aut \<equiv> \<lambda>p w. (\<exists>q \<in> finals. p \<in> initials \<and> (p, w, q) \<in> trans_star)"
+definition initials :: "'state set" where
+  "initials \<equiv> Init ` UNIV"
 
-definition lang_aut :: "('state * 'label list) set" where
+lemma initials_list:
+  "initials = set (map Init Enum.enum)"
+  using enum_UNIV unfolding initials_def by force
+
+definition accepts_aut :: "'ctr_loc \<Rightarrow> 'label list \<Rightarrow> bool" where
+  "accepts_aut \<equiv> \<lambda>p w. (\<exists>q \<in> finals. (Init p, w, q) \<in> trans_star)"
+
+definition lang_aut :: "('ctr_loc * 'label list) set" where
   "lang_aut = {(p,w). accepts_aut p w}"
 
 definition nonempty where
   "nonempty \<longleftrightarrow> lang_aut \<noteq> {}"
 
 lemma nonempty_alt: 
-  "nonempty \<longleftrightarrow> (\<exists>p \<in> initials. \<exists>q \<in> finals. \<exists>w. (p, w, q) \<in> trans_star)"
+  "nonempty \<longleftrightarrow> (\<exists>p. \<exists>q \<in> finals. \<exists>w. (Init p, w, q) \<in> trans_star)"
   unfolding lang_aut_def nonempty_def accepts_aut_def by auto
 
 typedef 'a mark_state = "{(Q :: 'a set, I). I \<subseteq> Q}"
@@ -94,10 +101,10 @@ lemma mark_sound: "mark ms \<Longrightarrow> (\<exists>p \<in> get_next ms. \<ex
   by (induct ms rule: mark.induct)
     (subst (asm) (2) mark.simps, fastforce dest: trans_star_step simp: Let_def split: if_splits)
 
-lemma nonempty_code[code]: "nonempty = mark (make_mark_state {} initials)"
+lemma nonempty_code[code]: "nonempty = mark (make_mark_state {} (set (map Init Enum.enum)))"
   using mark_complete[of _ _ _ "make_mark_state {} initials"]
-        mark_sound[of "make_mark_state {} initials"] nonempty_alt
-  by auto
+        mark_sound[of "make_mark_state {} initials"] nonempty_alt 
+  unfolding initials_def initials_list[symmetric] by auto
 
 
 end
@@ -106,22 +113,22 @@ end
 subsection \<open>Intersection P-Automaton locale\<close>
 
 locale Intersection_P_Automaton = 
-  A1: P_Automaton ts1 initials finals1 +
-  A2: P_Automaton ts2 initials finals2
+  A1: P_Automaton ts1 Init finals1 +
+  A2: P_Automaton ts2 Init finals2
   for ts1 :: "('state :: finite, 'label) transition set" 
-    and initials :: "'state set" 
+    and Init :: "'ctr_loc :: enum \<Rightarrow> 'state" 
     and finals1 :: "'state set" 
     and ts2 :: "('state, 'label) transition set" 
     and finals2 :: "'state set" 
 begin
 
-sublocale pa: P_Automaton "inters ts1 ts2" "(\<lambda>x. (x,x)) `  initials" "inters_finals finals1 finals2"
+sublocale pa: P_Automaton "inters ts1 ts2" "(\<lambda>p. (Init p, Init p))" "inters_finals finals1 finals2"
   .
 
 definition accepts_aut_inters where
-  "accepts_aut_inters p w = pa.accepts_aut (p,p) w"
+  "accepts_aut_inters p w = pa.accepts_aut p w"
 
-definition lang_aut_inters :: "('state * 'label list) set" where
+definition lang_aut_inters :: "('ctr_loc * 'label list) set" where
   "lang_aut_inters = {(p,w). accepts_aut_inters p w}"
 
 lemma trans_star_inter:
@@ -226,13 +233,13 @@ proof
   then show "A1.accepts_aut p w \<and> A2.accepts_aut p w"
     unfolding accepts_aut_inters_def A1.accepts_aut_def A2.accepts_aut_def pa.accepts_aut_def 
     unfolding inters_finals_def 
-    using inters_trans_star_iff[of p _ w _ ]
+    using inters_trans_star_iff[of _ _ w _ ]
     using SigmaE fst_conv inters_trans_star inters_trans_star1 snd_conv
-    by (metis (no_types, lifting) imageE)
+    by (metis (no_types, lifting))
 next
   assume a: "A1.accepts_aut p w \<and> A2.accepts_aut p w"
-  then have "(\<exists>q\<in>finals1. p \<in> initials \<and> (p, w, q) \<in> A1.trans_star) \<and> 
-             (\<exists>q\<in>finals2. p \<in> initials \<and> (p, w, q) \<in> A2.trans_star)" 
+  then have "(\<exists>q\<in>finals1. (Init p, w, q) \<in> A1.trans_star) \<and> 
+             (\<exists>q\<in>finals2. (Init p, w, q) \<in> A2.trans_star)" 
     unfolding A1.accepts_aut_def A2.accepts_aut_def by auto
   then show "accepts_aut_inters p w"
     unfolding accepts_aut_inters_def pa.accepts_aut_def inters_finals_def
@@ -240,7 +247,7 @@ next
 qed
 
 lemma lang_aut_alt: 
-  "pa.lang_aut = {((p, q), w). p = q \<and> (p, w) \<in> lang_aut_inters}"
+  "pa.lang_aut = {(p, w). (p, w) \<in> lang_aut_inters}"
   unfolding pa.lang_aut_def lang_aut_inters_def accepts_aut_inters_def pa.accepts_aut_def
   by auto
 
@@ -256,13 +263,13 @@ section \<open>Automata with epsilon\<close>
 subsection \<open>P-Automaton with epsilon locale\<close>
 
 locale P_Automaton_\<epsilon> = LTS_\<epsilon> transition_relation for transition_relation :: "('state::finite, 'label option) transition set" +
-  fixes finals :: "'state set" and initials :: "'state set"
+  fixes finals :: "'state set" and Init :: "'ctr_loc :: enum \<Rightarrow> 'state"
 begin
 
-definition accepts_aut_\<epsilon> :: "'state \<Rightarrow> 'label list \<Rightarrow> bool" where
-  "accepts_aut_\<epsilon> \<equiv> \<lambda>p w. (\<exists>q \<in> finals. p \<in> initials \<and> (p, w, q) \<in> trans_star_\<epsilon>)"
+definition accepts_aut_\<epsilon> :: "'ctr_loc \<Rightarrow> 'label list \<Rightarrow> bool" where
+  "accepts_aut_\<epsilon> \<equiv> \<lambda>p w. (\<exists>q \<in> finals. (Init p, w, q) \<in> trans_star_\<epsilon>)"
 
-definition lang_aut_\<epsilon> :: "('state * 'label list) set" where
+definition lang_aut_\<epsilon> :: "('ctr_loc * 'label list) set" where
   "lang_aut_\<epsilon> = {(p,w). accepts_aut_\<epsilon> p w}"
 
 definition nonempty_\<epsilon> where
@@ -274,11 +281,11 @@ end
 subsection \<open>Intersection P-Automaton with epsilon locale\<close>
 
 locale Intersection_P_Automaton_\<epsilon> = 
-  A1: P_Automaton_\<epsilon> ts1 finals1 initials +
-  A2: P_Automaton_\<epsilon> ts2 finals2 initials
+  A1: P_Automaton_\<epsilon> ts1 finals1 Init +
+  A2: P_Automaton_\<epsilon> ts2 finals2 Init
   for ts1 :: "('state :: finite, 'label option) transition set" 
     and finals1 :: "'state set" 
-    and initials :: "'state set" 
+    and Init :: "'ctr_loc :: enum \<Rightarrow> 'state"
     and ts2 :: "('state, 'label option) transition set" 
     and finals2 :: "'state set" 
 begin
@@ -286,13 +293,13 @@ begin
 abbreviation \<epsilon> :: "'label option" where
   "\<epsilon> == None"
 
-sublocale pa: P_Automaton_\<epsilon> "inters_\<epsilon> ts1 ts2" "inters_finals finals1 finals2" "(\<lambda>x. (x,x)) `  initials"
+sublocale pa: P_Automaton_\<epsilon> "inters_\<epsilon> ts1 ts2" "inters_finals finals1 finals2" "(\<lambda>p. (Init p, Init p))"
   .
 
 definition accepts_aut_inters_\<epsilon> where
-  "accepts_aut_inters_\<epsilon> p w = pa.accepts_aut_\<epsilon> (p,p) w"
+  "accepts_aut_inters_\<epsilon> p w = pa.accepts_aut_\<epsilon> p w"
 
-definition lang_aut_inters_\<epsilon> :: "('state * 'label list) set" where
+definition lang_aut_inters_\<epsilon> :: "('ctr_loc * 'label list) set" where
   "lang_aut_inters_\<epsilon> = {(p,w). accepts_aut_inters_\<epsilon> p w}"
 
 
@@ -675,13 +682,13 @@ proof
   then show "A1.accepts_aut_\<epsilon> p w \<and> A2.accepts_aut_\<epsilon> p w"
     unfolding accepts_aut_inters_\<epsilon>_def A1.accepts_aut_\<epsilon>_def A2.accepts_aut_\<epsilon>_def pa.accepts_aut_\<epsilon>_def 
     unfolding inters_finals_def 
-    using inters_trans_star_\<epsilon>_iff[of p _ w _ ]
+    using inters_trans_star_\<epsilon>_iff[of _ _ w _ ]
     using SigmaE fst_conv inters_trans_star_\<epsilon> inters_trans_star_\<epsilon>1 snd_conv
-    by (metis (no_types, lifting) imageE)
+    by (metis (no_types, lifting))
 next
   assume a: "A1.accepts_aut_\<epsilon> p w \<and> A2.accepts_aut_\<epsilon> p w"
-  then have "(\<exists>q\<in>finals1. p \<in> initials \<and> (p, w, q) \<in> A1.trans_star_\<epsilon>) \<and> 
-             (\<exists>q\<in>finals2. p \<in> initials \<and> (p, w, q) \<in> LTS_\<epsilon>.trans_star_\<epsilon> ts2)" 
+  then have "(\<exists>q\<in>finals1. (Init p, w, q) \<in> A1.trans_star_\<epsilon>) \<and> 
+             (\<exists>q\<in>finals2. (Init p, w, q) \<in> LTS_\<epsilon>.trans_star_\<epsilon> ts2)" 
     unfolding A1.accepts_aut_\<epsilon>_def A2.accepts_aut_\<epsilon>_def by auto
   then show "accepts_aut_inters_\<epsilon> p w"
     unfolding accepts_aut_inters_\<epsilon>_def pa.accepts_aut_\<epsilon>_def inters_finals_def

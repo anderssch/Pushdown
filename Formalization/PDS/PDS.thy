@@ -133,7 +133,7 @@ notation step_starp (infix "\<Rightarrow>\<^sup>*" 80)
 definition accepts :: "(('ctr_loc, 'noninit, 'label) state, 'label) transition set \<Rightarrow> ('ctr_loc, 'label) conf \<Rightarrow> bool" where
   "accepts ts \<equiv> \<lambda>(p,w). (\<exists>q \<in> finals. (Init p,w,q) \<in> LTS.trans_star ts)"
 
-lemma accepts_accepts_aut: "accepts ts (p, w) \<longleftrightarrow> P_Automaton.accepts_aut ts inits finals (Init p) w"
+lemma accepts_accepts_aut: "accepts ts (p, w) \<longleftrightarrow> P_Automaton.accepts_aut ts Init finals p w"
   unfolding accepts_def P_Automaton.accepts_aut_def inits_def by auto
 
 definition accepts_\<epsilon> :: "(('ctr_loc, 'noninit, 'label) state, 'label option) transition set \<Rightarrow> ('ctr_loc, 'label) conf \<Rightarrow> bool" where
@@ -166,11 +166,11 @@ lemma accepts_cons: "(Init p, \<gamma>, Init p') \<in> ts \<Longrightarrow> acce
 definition lang :: "(('ctr_loc, 'noninit, 'label) state, 'label) transition set \<Rightarrow> ('ctr_loc, 'label) conf set" where
   "lang ts = {c. accepts ts c}"
 
-lemma lang_lang_aut: "lang ts = (\<lambda>(s,w). (the_Ctr_Loc s, w)) ` (P_Automaton.lang_aut ts inits finals)"
+lemma lang_lang_aut: "lang ts = (\<lambda>(s,w). (s, w)) ` (P_Automaton.lang_aut ts Init finals)"
   unfolding lang_def P_Automaton.lang_aut_def
   by (auto simp: inits_def accepts_def P_Automaton.accepts_aut_def image_iff intro!: exI[of _ "Init _"])
 
-lemma lang_aut_lang: "P_Automaton.lang_aut ts inits finals = apfst Init ` lang ts"
+lemma lang_aut_lang: "P_Automaton.lang_aut ts Init finals = lang ts"
   unfolding lang_lang_aut
   by (auto 0 3 simp: P_Automaton.lang_aut_def P_Automaton.accepts_aut_def inits_def image_iff)
 
@@ -2077,8 +2077,8 @@ lemma accepts_inters_accepts_aut_inters:
   assumes "ts12 = inters ts1 ts2"
   assumes "finals12 = inters_finals finals1 finals2"
   shows "accepts_inters ts12 finals12 (p,w) \<longleftrightarrow>
-         Intersection_P_Automaton.accepts_aut_inters ts1 PDS_with_P_automata.inits finals1 ts2
-            finals2 (Init p) w"
+         Intersection_P_Automaton.accepts_aut_inters ts1 Init finals1 ts2
+            finals2 p w"
   by (simp add: Intersection_P_Automaton.accepts_aut_inters_def PDS_with_P_automata.inits_def 
       P_Automaton.accepts_aut_def accepts_inters_def assms)
 
@@ -2088,8 +2088,8 @@ definition lang_inters :: "(('ctr_loc, 'noninit, 'label) state * ('ctr_loc, 'non
 lemma lang_inters_lang_aut_inters:
   assumes "ts12 = inters ts1 ts2"
   assumes "finals12 = inters_finals finals1 finals2"
-  shows "(\<lambda>(p,w). (Init p, w)) ` lang_inters ts12 finals12 =
-         Intersection_P_Automaton.lang_aut_inters ts1  PDS_with_P_automata.inits finals1 ts2 finals2"
+  shows "(\<lambda>(p,w). (p, w)) ` lang_inters ts12 finals12 =
+         Intersection_P_Automaton.lang_aut_inters ts1 Init finals1 ts2 finals2"
   using assms
   by (auto simp: Intersection_P_Automaton.lang_aut_inters_def
     Intersection_P_Automaton.inters_accept_iff
