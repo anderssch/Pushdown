@@ -1,6 +1,6 @@
 chapter PDS
 
-session PDS (PDS) = "Deriving" +
+session PDS (PDS) = "LTS" +
   theories
     P_Automata
     PDS

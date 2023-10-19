@@ -17,7 +17,7 @@
 
 \begin{document}
 
-\title{TITLE}
+\title{Labelled Transition Systems}
 \author{Anders Schlichtkrull, Morten Konggaard Schou, Ji\v{r}\'i Srba and Dmitriy Traytel}
 \date{}
 
@@ -25,9 +25,10 @@
 
 \begin{abstract}
 \noindent
-ABSTRACT
-
-\cite{schwoon2002model}
+Labelled transition systems in computer science abound. They are used for e.g. pushdown systems and for program graphs in program analysis.
+We formalize labelled transition systems with and without epsilon transitions.
+In contrast to other formalizations (for an incomplete overview see \cite{graphs}) the set of nodes is formalized as a type rather than a set,
+and a labelled transition system is simply represented as a locale fixing a set of triples of respectively a note, a label and a note.
 
 
 \end{abstract}
@@ -39,17 +40,6 @@ ABSTRACT
 % sane default for proof documents
 \parindent 0pt
 \parskip 0.5ex
-
-\section{Introduction}
-INTRO
-
-\begin{figure}
-\begin{center}
-  \includegraphics[width=0.2\textwidth,keepaspectratio]{session_graph}
-\end{center}
-\caption{Theory dependency graph}
-\label{fig:thys}
-\end{figure}
 
 \newpage
 
