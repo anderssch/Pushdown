@@ -1,7 +1,6 @@
 theory PDS imports "P_Automata" "HOL-Library.While_Combinator" begin
 
 
-
 section \<open>PDS\<close>
 
 datatype 'label operation = pop | swap 'label | push 'label 'label

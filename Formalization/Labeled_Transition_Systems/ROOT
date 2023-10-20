@@ -1,6 +1,6 @@
-chapter LTS
+chapter Labeled_Transition_Systems
 
-session LTS (LTS) = "Deriving" +
+session Labeled_Transition_Systems (Labeled_Transition_Systems) = "Deriving" +
   theories
     LTS
   document_files

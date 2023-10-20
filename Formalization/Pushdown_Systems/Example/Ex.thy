@@ -1,5 +1,5 @@
 theory Ex
-  imports PDS.PDS_Code
+  imports Pushdown_Systems.PDS_Code
 begin
 
 (* Query specific part START *)
