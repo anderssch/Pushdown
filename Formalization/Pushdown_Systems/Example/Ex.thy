@@ -21,12 +21,6 @@ lift_definition y :: label is 1 by auto
 lift_definition q1 :: state is 0 by auto
 lift_definition q2 :: state is 1 by auto
 lift_definition qf :: state is 2 by auto
-(* List all control locations (in PDS), labels, and non-initial states in both P-automata *)
-(*
-definition ctr_loc_list where "ctr_loc_list = [p1,p2,p3]"
-definition label_list where "label_list = [x,y]"
-definition state_list where "state_list = [q1,q2,qf]"
-*)
 
 (* Define rules of PDS, and the two P-automata *)
 definition pds_rules :: "(ctr_loc, label) rule set" where
