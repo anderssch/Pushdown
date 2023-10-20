@@ -1,0 +1,14 @@
+chapter Pushdown_Systems
+
+session Pushdown_Systems (Pushdown_Systems) = "Labeled_Transition_Systems" +
+  theories
+    P_Automata
+    PDS
+    PDS_Code
+  document_files
+    "root.bib"
+    "root.tex"
+
+
+session Example (Pushdown_Systems) in Example = "Pushdown_Systems" +
+  theories Ex
