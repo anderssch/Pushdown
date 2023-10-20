@@ -787,35 +787,35 @@ lemma split_path_with_word_end':
   assumes "length ss' = Suc (length w')"
   assumes "WW = w @ w'"
   shows "(ss',w') \<in> path_with_word"
-  using assms
-proof (induction arbitrary: ss ss' w w' rule: LTS.path_with_word.induct[OF assms(1)])
-  case (1 s)
+  using assms(1) assms
+proof (induction arbitrary: ss ss' w w' rule: path_with_word.induct)
+  case (path_with_word_refl s)
   then show ?case
     by (metis Nil_is_append_conv Zero_not_Suc append_Nil list.sel(3) list.size(3) tl_append2)
 next
-  case (2 s' ssa wa s l)
+  case (path_with_word_step s' ssa wa s l)
   show ?case
   proof (cases "ss")
     case Nil
     then show ?thesis
-      using 2(4,5,6,7) path_with_word_length
+      using path_with_word_step(4,5,6,7) path_with_word_length
       by (auto simp: Cons_eq_append_conv)
   next
     case (Cons x xs)
     have "(s' # ssa, wa) \<in> LTS.path_with_word transition_relation"
-      using "2.hyps"(1) by blast
+      using "path_with_word_step.hyps"(1) by blast
     moreover
     have "s' # ssa = tl ss @ ss'"
-      using 2(5) using local.Cons by auto
+      using path_with_word_step(5) using local.Cons by auto
     moreover
     have "length ss' = Suc (length w')"
-      using "2.prems"(3) by blast
+      using "path_with_word_step.prems"(3) by blast
     moreover
     have "wa = tl w @ w'"
     proof (cases "wa = []")
       assume "wa \<noteq>[]"
       then show ?thesis
-        using 2(4-7) Cons path_with_word_length
+        using path_with_word_step(4-7) Cons path_with_word_length
         by (fastforce simp: Cons_eq_append_conv)
     next
       assume wa_empty: "wa = []"
@@ -824,17 +824,17 @@ next
       then have "(butlast (tl ss @ ss') @ [last (s' # ssa)], []) = (s' # ssa, wa)"
         using wa_empty by (simp add: calculation(2))
       then have "(butlast (tl ss @ ss') @ [last (s' # ssa)], []) \<in> LTS.path_with_word transition_relation"
-        using "2"(1) by metis
+        using "path_with_word_step"(1) by metis
       then have "length (butlast (tl ss @ ss')) = length ([]::'v list)"
         using LTS.path_with_word_lengths by (metis list.size(3)) 
       then have "w' = []"
         by (simp add: calculation(3))
       then show ?thesis
-        using "2.prems"(4) by force
+        using "path_with_word_step.prems"(4) by force
     qed
     ultimately
     show ?thesis
-      using 2(3)[of "tl ss" ss' w' "tl w"] by auto
+      using path_with_word_step(3)[of "tl ss" ss' w' "tl w"] by auto
   qed
 qed
 
@@ -1409,58 +1409,63 @@ subsection \<open>Reverse transition system\<close>
 fun rev_edge :: "('n,'v) transition \<Rightarrow> ('n,'v) transition" where
   "rev_edge (q\<^sub>s,\<alpha>,q\<^sub>o) = (q\<^sub>o, \<alpha>, q\<^sub>s)"
 
+lemma rev_edge_rev_edge_id[simp]: "rev_edge (rev_edge x) = x"
+  by (cases x) auto
+
 fun rev_path_with_word :: "'n list * 'v list \<Rightarrow> 'n list * 'v list" where
   "rev_path_with_word (es,ls) = (rev es, rev ls)"
 
 definition rev_edge_list :: "('n,'v) transition list \<Rightarrow> ('n,'v) transition list" where
   "rev_edge_list ts = rev (map rev_edge ts)"
 
+context LTS begin
+
+interpretation rev_LTS: LTS "(rev_edge ` transition_relation)"
+  .
+
 lemma rev_path_in_rev_pg:
-  assumes "(ss, w) \<in> LTS.path_with_word edge_set"
-  shows "(rev ss, rev w) \<in> LTS.path_with_word (rev_edge ` edge_set)"
-  using assms 
-proof (induction rule: LTS.path_with_word_induct_reverse[OF assms])
-  case (1 s)
-  show ?case
+  assumes "(ss, w) \<in> path_with_word"
+  shows "(rev ss, rev w) \<in> rev_LTS.path_with_word"
+  using assms(1) assms 
+proof (induction rule: path_with_word_induct_reverse)
+  case (path_with_word_refl s)
+  then show ?case 
     by (simp add: LTS.path_with_word.path_with_word_refl)
 next
-  case (2 ss s w l s')
-  have "(s', l, s) \<in> rev_edge ` edge_set"
-    using 2 by (simp add: rev_image_eqI)
+  case (path_with_word_step_rev ss s w l s')
+ have "(s', l, s) \<in> rev_edge ` transition_relation"
+    using path_with_word_step_rev by (simp add: rev_image_eqI)
   moreover 
-  have "(rev (ss @ [s]), rev w) \<in> LTS.path_with_word (rev_edge ` edge_set)"
-    using "2.IH" "2.hyps"(1) by blast
-  then have "(s # rev ss, rev w) \<in> LTS.path_with_word (rev_edge ` edge_set)"
+  have "(rev (ss @ [s]), rev w) \<in> LTS.path_with_word (rev_edge ` transition_relation)"
+    using "path_with_word_step_rev.IH" "path_with_word_step_rev.hyps"(1) by blast
+  then have "(s # rev ss, rev w) \<in> LTS.path_with_word (rev_edge ` transition_relation)"
     by auto
   ultimately
-  have "(s' # s # rev ss, l # rev w) \<in> LTS.path_with_word (rev_edge ` edge_set)"
+  have "(s' # s # rev ss, l # rev w) \<in> LTS.path_with_word (rev_edge ` transition_relation)"
     by (simp add: LTS.path_with_word.path_with_word_step)
   then show ?case
     by auto
 qed
 
-lemma rev_edge_rev_edge_id[simp]: "rev_edge (rev_edge x) = x"
-  by (cases x) auto
-
 lemma transition_list_rev_edge_list:
-  assumes "(ss,w) \<in> LTS.path_with_word edge_set"
+  assumes "(ss,w) \<in> path_with_word"
   shows "transition_list (rev ss, rev w) = rev_edge_list (transition_list (ss, w))"
-  using assms 
-proof (induction rule: LTS.path_with_word.induct[OF assms])
-  case (1 s)
+  using assms(1) assms 
+proof (induction rule: path_with_word.induct)
+  case (path_with_word_refl s)
   then show ?case
     by (simp add: rev_edge_list_def)
 next
-  case (2 s' ss w s l)
+  case (path_with_word_step s' ss w s l)
   have "transition_list (rev (s # s' # ss), rev (l # w)) = transition_list (rev ss @ [s', s], rev w @ [l])"
     by auto
   moreover
   have "... = transition_list (rev ss @ [s'], rev w) @ [(s', l, s)]"
     using transition_list_reversed_simp[of "rev ss" "rev w" s' s l]
-    using "2.hyps"(1) LTS.path_with_word_lengths rev_path_in_rev_pg by fastforce
+    using "path_with_word_step.hyps"(1) LTS.path_with_word_lengths rev_path_in_rev_pg by fastforce
   moreover
   have "... = rev_edge_list (transition_list (s' # ss, w)) @ [(s', l, s)]"
-    using 2 by auto
+    using path_with_word_step by auto
   moreover
   have "... = rev_edge_list ((s, l, s') # transition_list (s' # ss, w))"
     unfolding rev_edge_list_def by auto
@@ -1471,6 +1476,8 @@ next
   show ?case
     by metis
 qed
+
+end
 
 section \<open>LTS with epsilon\<close>
 
@@ -1650,16 +1657,16 @@ lemma trans_star_not_to_source_\<epsilon>:
   assumes "q' \<in> srcs"
   shows "q' \<noteq> q"
   using assms 
-proof (induction rule: LTS_\<epsilon>.trans_star_\<epsilon>.induct[OF assms(1)])
-  case (1 p)
+proof (induction rule: trans_star_\<epsilon>.induct)
+  case (trans_star_\<epsilon>_refl p)
   then show ?case
     by blast 
 next
-  case (2 p \<gamma> q' w q)
+  case (trans_star_\<epsilon>_step_\<gamma> p \<gamma> q' w q)
   then show ?case
     using srcs_def2 by metis 
 next
-  case (3 p q' w q)
+  case (trans_star_\<epsilon>_step_\<epsilon> p q' w q)
   then show ?case
     using srcs_def2 by metis 
 qed
