@@ -30,6 +30,10 @@ For pre* we refine the algorithm to an executable version for which one can gene
 For pre* and post* we follow Stefan Schwoon's PhD thesis \cite{schwoon2002model}. The dual* algorithm is from a paper by Jensen et. al presented at ATVA2021 \cite{DBLP:conf/atva/JensenSSSVD21}.
 The formalization is described in our FMCAD2022 paper \cite{DBLP:conf/fmcad/SchlichtkrullSST22} in which we also document how we have used it to do differential
 testing against a C++ implementation of pushdown reachability called PDAAAL.
+Lammich et al.\ \cite{Lammich-DPN,DBLP:conf/cav/LammichMW09} formalized the pre* algorithm for
+dynamic pushdown networks (DPN) which is a generalization of pushdown systems. 
+Our work is independent from that because the post* of DPNs is not regular and 
+additionally the DPN formalization does not support epsilon transitions which we use for post* and dual*.
 
 
 \end{abstract}
