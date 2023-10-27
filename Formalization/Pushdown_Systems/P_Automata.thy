@@ -374,7 +374,6 @@ proof (induction "length w1 + length w2" arbitrary: w1 w2 w p1 q1 rule: less_ind
     note False_outer_outer_outer_outer = False
     show ?thesis 
     proof (cases "w1 = [] \<and> w2 = []")
-      term replicate
       case True
       then have same: "p1 = p2 \<and> q1 = q2"
         by (metis LTS.trans_star_empty less.prems(3) less.prems(4))

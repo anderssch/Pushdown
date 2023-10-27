@@ -52,6 +52,6 @@ lemma check_Some: "check \<Delta> I IF IF_st F FF FF_st = Some b \<longleftright
 
 declare P_Automaton.mark.simps[code]
 
-export_code check in SML
+export_code check checking SML
 
 end

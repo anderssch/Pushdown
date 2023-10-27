@@ -871,12 +871,8 @@ theorem pre_star_exec_lang_correct:
 theorem pre_star_exec_check_accepts_correct:
   assumes "pre_star_exec_check A \<noteq> None"
   shows "{c. accepts (the (pre_star_exec_check A)) c} = pre_star (lang A)"
-  using pre_star_exec_accepts_correct assms unfolding pre_star_exec_check_def apply auto
-  using pre_star_exec_def apply fastforce
-  using pre_star_exec_def apply fastforce
-   apply (metis option.discI subsetD)
-  apply (metis option.discI subsetD)
-  done
+  using pre_star_exec_accepts_correct assms unfolding pre_star_exec_check_def pre_star_exec_def
+  by (auto split: if_splits)
 
 theorem pre_star_exec_check_correct:
   assumes "pre_star_exec_check A \<noteq> None"
@@ -901,8 +897,7 @@ theorem accept_pre_star_exec_correct_Some_True:
 proof -
   have "inits \<subseteq> LTS.srcs A"
     using assms unfolding accept_pre_star_exec_check_def
-    apply auto
-    by (meson in_mono option.distinct(1)) 
+    by (auto split: if_splits)
   moreover
   have "accepts (pre_star_exec A) c"
     using assms
@@ -918,8 +913,7 @@ theorem accept_pre_star_exec_correct_Some_False:
 proof -
   have "inits \<subseteq> LTS.srcs A"
     using assms unfolding accept_pre_star_exec_check_def
-    apply auto
-    by (meson in_mono option.distinct(1)) 
+    by (auto split: if_splits)
   moreover
   have "\<not>accepts (pre_star_exec A) c"
     using assms
@@ -1840,7 +1834,6 @@ next
         by auto
       then have p1_\<gamma>1_p_u: "(p1, [\<gamma>1]) \<Rightarrow>\<^sup>* (p, LTS_\<epsilon>.remove_\<epsilon> u)"
         by auto
-      term \<gamma>2
       from IX have "\<exists>\<gamma>2\<epsilon> \<gamma>2ss. LTS_\<epsilon>.\<epsilon>_exp \<gamma>2\<epsilon> [\<gamma>2] \<and> (Init p2, \<gamma>2\<epsilon>, \<gamma>2ss, q') \<in> LTS.trans_star_states Aiminus1"
         by (meson LTS.trans_star_trans_star_states LTS_\<epsilon>.trans_star_\<epsilon>_\<epsilon>_exp_trans_star)
       then obtain \<gamma>2\<epsilon> \<gamma>2ss where XI_1: "LTS_\<epsilon>.\<epsilon>_exp \<gamma>2\<epsilon> [\<gamma>2] \<and> (Init p2, \<gamma>2\<epsilon>, \<gamma>2ss, q') \<in> LTS.trans_star_states Aiminus1"
@@ -2095,20 +2088,6 @@ lemma lang_inters_lang_aut_inters:
     accepts_inters_accepts_aut_inters lang_inters_def is_Init_def
     PDS_with_P_automata.inits_def P_Automaton.accepts_aut_def image_iff)
 
-thm Intersection_P_Automaton.trans_star_inter
-
-thm Intersection_P_Automaton.inters_trans_star1
-
-thm Intersection_P_Automaton.inters_trans_star
-
-thm Intersection_P_Automaton.inters_trans_star_iff
-
-thm Intersection_P_Automaton.inters_accept_iff
-
-term PDS_with_P_automata.accepts
-
-term PDS_with_P_automata.finals
-
 lemma inters_accept_iff: 
   assumes "ts12 = inters ts1 ts2"
   assumes "finals12 = inters_finals (PDS_with_P_automata.finals final_initss1 final_noninits1) 
@@ -2215,7 +2194,6 @@ proof (induction "length w1 + length w2" arbitrary: w1 w2 w p1 q1 rule: less_ind
     note False_outer_outer_outer_outer = False
     show ?thesis 
     proof (cases "w1 = [] \<and> w2 = []")
-      term replicate
       case True
       then have same: "p1 = p2 \<and> q1 = q2"
         by (metis LTS.trans_star_empty less.prems(3) less.prems(4))
