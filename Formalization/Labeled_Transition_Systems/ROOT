@@ -1,6 +1,7 @@
-chapter Labeled_Transition_Systems
+chapter AFP
 
-session Labeled_Transition_Systems (Labeled_Transition_Systems) = "Deriving" +
+session Labeled_Transition_Systems = "Deriving" +
+  options [timeout = 300]
   theories
     LTS
   document_files
