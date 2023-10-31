@@ -1,6 +1,6 @@
-chapter Pushdown_Systems
+chapter AFP
 
-session Pushdown_Systems (Pushdown_Systems) = "Labeled_Transition_Systems" +
+session Pushdown_Systems = "Labeled_Transition_Systems" +
   options [timeout = 300]
   theories
     P_Automata
